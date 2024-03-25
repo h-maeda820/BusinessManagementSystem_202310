@@ -10,7 +10,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -146,7 +145,7 @@ public class CalendarController {
 			pageList.add(String.valueOf(i + 1));
 		}
 		//ページ数が1の場合ページネーション表示なし
-		if (pageList.size() == 1) {
+		if (pageList.size() <= 1) {
 			pageDisplay = false;
 		}
 
@@ -381,20 +380,27 @@ public class CalendarController {
 	@GetMapping("/regist")
 	public String registCalendarGet(
 			@ModelAttribute("calendarData") CalendarData calendarData,
-			@ModelAttribute("CalendarDetail") CalendarDetailManager CalendarDetail,
+			@ModelAttribute("calendarDatail") CalendarDetailManager calendarDetail,
 			@ModelAttribute("selectDialogForm") SelectDialogForm selectDialogForm,
+			@ModelAttribute("mode") String cMode,
 			RedirectAttributes attr,
 			Model model) {
 
-		String mode = "regist";
+		//選択行コピーからの遷移のとき、modeを"copyにする。"
+		String mode = "";
+		if (cMode.isEmpty()) {
+			mode = "regist";
+		} else {
+			mode = cMode;
+		}
 
 		CalendarDetailManager details;
 
-		if (CalendarDetail.getAll().isEmpty()) {
+		if (calendarDetail.getAll().isEmpty()) {
 			details = getDataAndHoliday(calendarData.getYearMonth());
 		} else {
-			//スコープから取得できた場合(ダイアログの検索ボタンが押されていた時)
-			details = CalendarDetail;
+			//スコープから取得できた場合(ダイアログの検索ボタンが押されていた時または選択行コピー)
+			details = calendarDetail;
 		}
 
 		//カレンダーに表示できる形に整形
@@ -427,6 +433,7 @@ public class CalendarController {
 			@RequestParam(name = "day", required = false) String[] day,
 			@RequestParam(name = "holidayFlg", required = false) String[] holidayFlg,
 			@RequestParam(name = "comment", required = false) String[] comment,
+			@RequestParam(name = "mode", required = false) String mode,
 			RedirectAttributes redirectAttributes,
 			Model model) {
 
@@ -454,7 +461,8 @@ public class CalendarController {
 						+ "」はカレンダーマスタにすでに存在しています。");
 			}
 			redirectAttributes.addFlashAttribute("calendarData", calendarData);
-			redirectAttributes.addFlashAttribute("CalendarDetail", details);
+			redirectAttributes.addFlashAttribute("calendarDetail", details);
+			redirectAttributes.addFlashAttribute("mode", mode);
 			return "redirect:/calendar/regist";
 		} else {
 			details.setAndTransformDate(day, calendarData.getYearMonth());
@@ -535,10 +543,11 @@ public class CalendarController {
 			return "redirect:/calendar/create";
 		}
 
-		//boolean isDuplication = false;
-		boolean isExclusion = false;
+		String isDuplication = "";
+		String isExclusion = "";
 
 		List<String> duplicationList = new ArrayList<>();
+		List<String> exclusionList = new ArrayList<>();
 
 		//重複チェック
 
@@ -557,8 +566,8 @@ public class CalendarController {
 		LocalDate startDate = LocalDate.parse(formattedFrom);
 		LocalDate endDate = LocalDate.parse(formattedTo);
 
-		//重複チェック
 		for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusMonths(1)) {
+			//重複チェック
 			if (calendarService.duplicateCheck(calendarData.getClientName(), calendarData.getEmployeeId(),
 					date) != -1) {
 
@@ -571,20 +580,31 @@ public class CalendarController {
 
 				//リストに追加
 				duplicationList.add(formattedDate);
+				isDuplication = "open";
+
+				String seqId = calendarService.getSeqId(calendarData, date).toString();
+
+				//排他チェック(編集中)
+				if (exclusiveCheck.ExclusiveCheckEdited(seqId, userId, tableNumber)) {
+
+					exclusionList.add(formattedDate);
+					isExclusion = "open";
+				}
+				/* 排他チェック（編集済） */
+				exclusiveCheck.ExclusiveLockDalete(seqId, userId, tableNumber);
 			}
 		}
-		//リストがnullじゃなければ重複している
-		if (!duplicationList.isEmpty()) {
-			attr.addFlashAttribute("isDuplication", "open");
+
+		//編集中
+		if (isExclusion.equals("open")) {
+			attr.addFlashAttribute("isExclusion", isExclusion);
+			attr.addFlashAttribute("exclusionList", exclusionList);
+		}
+		//重複している
+		else if (isDuplication.equals("open")) {
+			attr.addFlashAttribute("isDuplication", isDuplication);
 			attr.addFlashAttribute("duplicationList", duplicationList);
-
 		}
-		//排他チェック
-		if (true) {
-			isExclusion = true;
-		}
-
-		attr.addFlashAttribute("isExclusion", isExclusion);
 
 		return "redirect:/calendar/create";
 	}
@@ -616,7 +636,7 @@ public class CalendarController {
 		LocalDate startDate = LocalDate.parse(formattedFrom);
 		LocalDate endDate = LocalDate.parse(formattedTo);
 
-		Map<String, String> duplicationList = new HashMap<>();
+		//Map<String, String> duplicationList = new HashMap<>();
 
 		// 登録
 		for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusMonths(1)) {
@@ -691,10 +711,9 @@ public class CalendarController {
 			RedirectAttributes attr,
 			Model model) {
 
-		//排他チェック（削除
+		//排他チェック（削除)
 		if (exclusiveCheck.ExclusiveCheckDalete(seqId, tableNumber)) {
-			String result = "該当データはすでに削除されています。";
-			attr.addFlashAttribute("result", result);
+			attr.addFlashAttribute("result", "該当データはすでに削除されています。");
 
 			return "redirect:/calendar/list";
 		}
@@ -890,6 +909,44 @@ public class CalendarController {
 		exclusiveCheck.ExclusiveLockDalete(seqId, userId, tableNumber);
 
 		return "redirect:/calendar/list";
+	}
+
+	//選択行コピー
+	@PostMapping("/copy")
+	public String copyCalender(@RequestParam(name = "seqId", required = false) String[] seqId,
+			RedirectAttributes attr,
+			Model model) {
+
+		//選択されているか
+		if (seqId == null) {
+			attr.addFlashAttribute("result", "対象が選択されていません。対象を選択してください。");
+			return "redirect:/calendar/list";
+		}
+		//選択数が1件か
+		else if (seqId.length != 1) {
+			attr.addFlashAttribute("result", "コピー対象が複数選択されています。");
+			return "redirect:/calendar/list";
+		}
+		// 排他チェック(削除)
+		else if (exclusiveCheck.ExclusiveCheckDalete(seqId[0], tableNumber)) {
+			attr.addFlashAttribute("result", "該当データはすでに削除されています。");
+			return "redirect:/calendar/list";
+		}
+
+		// 顧客、社員、年月情報取得
+		CalendarData calendarData = calendarService.searchCalendarData(seqId[0]);
+
+		//社員情報消す？
+
+		// カレンダー詳細情報取得
+		CalendarDetailManager calendarList = calendarService.searchCalendarDetails(seqId[0]);
+
+		attr.addFlashAttribute("calendarData", calendarData);
+		attr.addFlashAttribute("calendarDatail", calendarList);
+
+		attr.addFlashAttribute("mode", "copy");
+
+		return "redirect:/calendar/regist";
 	}
 
 	/**

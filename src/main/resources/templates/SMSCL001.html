@@ -100,7 +100,7 @@
 									<th scope="col" style="width: 120px;font-weight:normal;" class="position-relative">
 										<a th:href="@{/client/edit?id={client_id}(client_id=${item.client_id})}"
 											class="stretched-link" th:text="${item.client_name}"
-											th:value="${item.client_id}" name="client_name"></a>
+											th:value="${item.client_id}" name="clientName"></a>
 									</th>
 									<th scope="col" style="font-weight:normal" th:text="${item.open_time}"></th>
 									<th scope="col" style="font-weight:normal" th:text="${item.close_time}"></th>
@@ -233,7 +233,8 @@
 				row.addEventListener("dblclick", function () {
 
 					// クリックされた行から顧客番号と顧客名を取得
-					var clientId = $('input[id="client_id"]').val();
+					//var clientId = $('input[name="clientName"]').val();
+					var clientId = row.querySelector("input[type=checkbox]").value;
 
 					//ダブルクリック後の遷移先をgetに変更					
 					var url = "/client/edit?id=" + clientId;

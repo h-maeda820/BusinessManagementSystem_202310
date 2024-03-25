@@ -319,6 +319,13 @@ public class CalendarService {
 		return result;
 	}
 
+	//シーケンスidを取得する
+	public Integer getSeqId(CalendarData calendarData, LocalDate year_month) {
+
+		Integer result = calendarRepository.getSeqId(calendarData, year_month);
+		return result;
+	}
+
 	//前月を取得する
 	public Integer getLastMonth(CalendarData calendarData) {
 

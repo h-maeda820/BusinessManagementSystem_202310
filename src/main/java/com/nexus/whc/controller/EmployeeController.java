@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Year;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -102,37 +103,16 @@ public class EmployeeController {
 
 			//ステータスを設定する
 			for (Map<String, Object> status : list) {
-				/*今年の休暇数を取得　Object→String→Integerに変換*/
-				Object oHolidayCount = status.get("holiday_count");
-				String sHolidayCount = oHolidayCount.toString();
-				Integer holidayCount = new Integer(sHolidayCount).intValue();
 
-				/*有給残日数(当年度分)を取得　Object→String→Integerに変換*/
-				Object oRemaindThisYear = status.get("remaind_this_year");
-				String sRemaindThisYear = oRemaindThisYear.toString();
-				Integer remaindThisYear = new Integer(sRemaindThisYear).intValue();
+				//有給残日数(当年度分)を取得　
+				Integer remaindThisYear = Integer.parseInt(status.get("remaind_this_year").toString());
+				//有給残日数(前年度分)を取得
+				Integer remaindLastYear = Integer.parseInt(status.get("remaind_last_year").toString());
+				//有休基準日を取得
+				LocalDate paidHolidayStd = LocalDate.parse(status.get("paid_holiday_std").toString());
 
-				/*有給残日数(前年度分)を取得　Object→String→Integerに変換*/
-				Object oRemaindLastYear = status.get("remaind_last_year");
-				String sRemaindLastYear = oRemaindLastYear.toString();
-				Integer remaindLastYear = new Integer(sRemaindLastYear).intValue();
-
-				/*ステータスの文言を初期化*/
-				String attributeValue = "";
-
-				//条件が違うから変更する 未完成
-				/*有給取得が5日未満の場合、日数に応じてステータスの文言を変更*/
-				if (remaindThisYear + remaindLastYear - holidayCount <= 0) {
-					attributeValue = "有給残日数なし";
-				} else if (remaindThisYear != 0 && holidayCount == 0 || holidayCount == 1) {
-					attributeValue = "有給取得日数不足(警告)";
-				} else if (remaindThisYear != 0 && holidayCount == 2 || holidayCount == 3) {
-					attributeValue = "有給取得日数不足(注意)";
-				} else if (remaindThisYear != 0 && holidayCount == 4) {
-					attributeValue = "有給取得日数不足(通知)";
-				}
-
-				/*ステータスの文言に置き換え*/
+				//ステータスを取得して保存
+				String attributeValue = getStatus(remaindThisYear, remaindLastYear, paidHolidayStd);
 				status.put("application_class", attributeValue);
 
 				//顧客番号を3桁に変換
@@ -198,7 +178,7 @@ public class EmployeeController {
 			pageList.add(String.valueOf(i + 1));
 		}
 		//ページ数が1の場合ページネーション表示なし
-		if (pageList.size() == 1) {
+		if (pageList.size() <= 1) {
 			pageDisplay = false;
 		}
 
@@ -906,32 +886,20 @@ public class EmployeeController {
 		}
 		model.addAttribute("employeeDate", empData);
 
-		/*今年の休暇数を取得　Object→String→Integerに変換*/
-		Object oHolidayCount = empData.getHolidayCount();
-		String sHolidayCount = oHolidayCount.toString();
-		Integer holidayCount = new Integer(sHolidayCount).intValue();
-
 		/*有給残日数(当年度分)を取得　Object→String→Integerに変換*/
-		Object oRemaindThisYear = empData.getRemaindThisYear();
-		String sRemaindThisYear = oRemaindThisYear.toString();
-		Integer remaindThisYear = new Integer(sRemaindThisYear).intValue();
+		Integer remaindThisYear = Integer.parseInt(empData.getRemaindThisYear().toString());
 
 		/*有給残日数(前年度分)を取得　Object→String→Integerに変換*/
-		Object oRemaindLastYear = empData.getRemaindLastYear();
-		String sRemaindLastYear = oRemaindLastYear.toString();
-		Integer remaindLastYear = new Integer(sRemaindLastYear).intValue();
+		Integer remaindLastYear = Integer.parseInt(empData.getRemaindLastYear().toString());
 
-		//条件が違うから変更する 未完成
-		/*有給取得が5日未満の場合、日数に応じてステータスの文言を変更*/
-		if (remaindThisYear + remaindLastYear - holidayCount <= 0) {
-			model.addAttribute("status", "有給残日数なし");
-		} else if (remaindThisYear != 0 && holidayCount == 0 || holidayCount == 1) {
-			model.addAttribute("status", "有給取得日数不足(警告)");
-		} else if (remaindThisYear != 0 && holidayCount == 2 || holidayCount == 3) {
-			model.addAttribute("status", "有給取得日数不足(注意)");
-		} else if (remaindThisYear != 0 && holidayCount == 4) {
-			model.addAttribute("status", "有給取得日数不足(通知)");
-		}
+		//有休基準日を取得
+		LocalDate paidHolidayStd = LocalDate.parse(empData.getPaidHolidayStd());
+
+		//ステータスを取得
+		String status = getStatus(remaindThisYear, remaindLastYear, paidHolidayStd);
+
+		//保存
+		model.addAttribute("status", status);
 
 		//ダイアログ表示処理
 		dialogProcess(selectDialogForm, model);
@@ -1358,6 +1326,56 @@ public class EmployeeController {
 		}
 
 		model.addAttribute("selectDialogForm", selectDialogForm);
+	}
+
+	/**
+	 * ステータスを返すメソッド
+	 * @param remaindThisYear
+	 * @param remaindLastYear
+	 * @param paidHolidayStd
+	 * @return
+	 */
+	private String getStatus(Integer remaindThisYear, Integer remaindLastYear, LocalDate paidHolidayStd) {
+
+		/*ステータスの文言を初期化*/
+		String attributeValue = "";
+
+		//今日の日付
+		LocalDate today = LocalDate.now();
+
+		//今日の日付が基準日の前かどうか
+		if (paidHolidayStd.isAfter(today)) {
+
+			//有休残日数が0か
+			if (remaindThisYear == 0 && remaindLastYear == 0) {
+
+				attributeValue = "有給残日数なし";
+			} else {
+
+				// 月日の差を計算
+				long daysDifference = Math.abs(ChronoUnit.DAYS.between(paidHolidayStd, today));
+				long monthsDifference = Math.abs(ChronoUnit.MONTHS.between(paidHolidayStd, today));
+
+				// 条件に応じて出力
+				if (daysDifference <= 7) {
+					attributeValue = "有給取得日数不足(警告)";
+				} else if (daysDifference <= 31) { // 1ヶ月の場合
+					attributeValue = "有給取得日数不足(注意)";
+				} else if (monthsDifference <= 6) { // 6ヶ月の場合
+					attributeValue = "有給取得日数不足(通知)";
+				}
+
+				//				System.out.println("今日の日付: " + today);
+				//				System.out.println("基準日: " + paidHolidayStd);
+				//				System.out.println("日の差: " + daysDifference + "日");
+				//				System.out.println("月の差: " + monthsDifference + "ヶ月");
+				//				System.out.println("ステータス: " + attributeValue);
+				//
+				//				System.out.println();
+			}
+		}
+
+		return attributeValue;
 	}
 
 }

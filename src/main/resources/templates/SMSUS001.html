@@ -30,12 +30,14 @@
 
 			<main class="w-100 bg-light">
 				<div class="container bg-white border py-3 my-3">
-					<div class="accordion">
-						<div class="card shadow bg-light">
 
-							<!-- 注意文を表示する-->
-							<div class="text-danger" th:text="${result}"></div>
-							<h3 class="font-weight-bold p-2">検索条件</h3>
+					<div class="card shadow bg-light">
+
+						<!-- 注意文を表示する-->
+						<div class="text-danger" th:text="${result}"></div>
+						<h3 class="font-weight-bold p-2" id="folding">検索条件</h3>
+						<div class="accordion">
+
 							<div class="card-body p-2" style="display: flex">
 								<div class="input-group mb-2 mx-2" style="width: 600px">
 									<span class="input-group-text">ユーザID</span>
@@ -72,6 +74,7 @@
 							</div>
 						</div>
 					</div>
+
 					<div class="card-body p-2" style="display: flex">
 						<button type="button" class="btn btn-success border border-dark mb-2 mx-2"
 							style="color: white; background-color: cornflowerblue;"
@@ -113,7 +116,8 @@
 							<div class="row">
 								<div class="col-5 text-end">
 									<th:block th:if="${pageNumber > 1}">
-										<a class="mx-3" th:href="@{/user/pageList(pageNumber=${previous_page})}">←　前のページ</a>
+										<a class="mx-3"
+											th:href="@{/user/pageList(pageNumber=${previous_page})}">←　前のページ</a>
 									</th:block>
 								</div>
 								<div class="col-2 text-center">

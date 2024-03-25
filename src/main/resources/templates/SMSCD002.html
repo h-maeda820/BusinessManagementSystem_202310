@@ -236,6 +236,7 @@
 						<input type="hidden" id="isDuplication" th:value="${isDuplication}">
 						<input type="hidden" id="duplicationList" th:value="${duplicationList}">
 						<input type="hidden" id="isExclusion" th:value="${isExclusion}">
+						<input type="hidden" id="exclusionList" th:value="${exclusionList}">
 
 						<!--新規登録時のエラーメッセージ-->
 						<div class="text-danger" th:if="${result != null}">
@@ -321,11 +322,11 @@
 
 											<input type="text" aria-label="year" class="form-control position-relative"
 												style="width: 60px" name="year" th:value="*{year != null ? year : ''}"
-												th:readonly="${mode =='view' || mode == 'regist'}">
+												th:readonly="${mode =='view' || mode == 'regist' || mode == 'copy'}">
 											<input type="text" aria-label="month" class="form-control position-relative"
 												style="width: 45px" name="month"
 												th:value="*{month != null ? month : ''}"
-												th:readonly="${mode =='view' || mode == 'regist'}">
+												th:readonly="${mode =='view' || mode == 'regist' || mode == 'copy'}">
 											<button type="submit" class="btn btn-outline-secondary border border-dark"
 												formaction="/calendar/followingMonth"
 												th:if="${followingMonth == true && mode == 'view'}">＞</button>
@@ -333,7 +334,8 @@
 												style="color: white" formaction="/calendar/create"
 												th:if="${mode == 'create'}">登録</button>
 											<button type="submit" class="btn btn-def border border-dark ms-5"
-												id="create" style="color: white" th:if="${mode == 'regist'}">確定</button>
+												id="create" style="color: white"
+												th:if="${mode == 'regist' || mode == 'copy'}">確定</button>
 											<button type="submit" id="update"
 												class="btn btn-def border border-dark ms-5" style="color: white"
 												formaction="/calendar/edit" th:if="${mode == 'edit'}">更新</button>
@@ -380,7 +382,8 @@
 															<label class="ms-2">休日</label>
 														</div>
 														<!-- 登録・編集 -->
-														<div th:if="${mode == 'regist' || mode == 'edit'}">
+														<div
+															th:if="${mode == 'regist' || mode == 'copy' || mode == 'edit'}">
 															<input type="checkbox" aria-label="year"
 																class="form-check-input mt-0 holiday-checkbox"
 																th:checked="${item != null ? item.holidayFlg : false}" />
@@ -624,7 +627,7 @@
 				}
 
 				//登録2
-				if (mode == 'regist') {
+				if (mode == 'regist' || mode == 'copy') {
 					var form = $(this).closest('form');
 					form.attr('action', '/calendar/regist/searchDialog');
 					form.submit();
@@ -736,7 +739,7 @@
 				}
 			});
 
-			//暦通り登録上書き確認
+			//暦通り登録上書き重複確認
 			document.addEventListener("DOMContentLoaded", function () {
 
 				var flag = $("#isDuplication").val();
@@ -761,7 +764,20 @@
 				}
 			});
 
+			//暦通り登録上書き確認
+			document.addEventListener("DOMContentLoaded", function () {
 
+				var flag = $("#isExclusion").val();
+				
+				if (flag == "open") {
+
+					var list = $("#exclusionList").val();
+					// ダイアログに表示するメッセージの生成
+					var message = "登録しようとしている年月の中に編集中のデータが存在します。\n 編集中データ：" + list;
+
+					alert(message);
+				}
+			});
 		</script>
 
 

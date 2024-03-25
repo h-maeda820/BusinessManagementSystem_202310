@@ -720,6 +720,25 @@ public class CalendarRepository {
 		}
 	}
 
+	//シーケンスidを取得する
+	public Integer getSeqId(CalendarData calendarData, LocalDate year_month) {
+
+		String sql = "SELECT m_calendar.seq_id\n"
+				+ "FROM m_calendar \n"
+				+ "LEFT JOIN m_client ON m_calendar.client_id = m_client.client_id \n"
+				+ "WHERE m_client.client_name= ? \n"
+				+ "AND  m_calendar.employee_id = ? \n"
+				+ "AND  m_calendar.`year_month` = ? \n"
+				+ "AND m_calendar.delete_flg = false ";
+
+		Object[] param = { calendarData.getClientName(), calendarData.getEmployeeId(), year_month };
+		try {
+			return jdbcTemplate.queryForObject(sql, param, Integer.class);
+		} catch (EmptyResultDataAccessException e) {
+			return -1;
+		}
+	}
+
 	//前月を取得する
 	public Integer getLastMonth(CalendarData calendarData) {
 

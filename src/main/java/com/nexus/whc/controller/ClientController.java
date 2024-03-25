@@ -131,7 +131,7 @@ public class ClientController {
 			pageList.add(String.valueOf(i + 1));
 		}
 		//ページ数が1の場合ページネーション表示なし
-		if (pageList.size() == 1) {
+		if (pageList.size() <= 1) {
 			pageDisplay = false;
 		}
 

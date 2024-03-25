@@ -236,7 +236,8 @@
 
                     <button type="button" class="btn btn-def my-2 mx-1" style="width: 150px"
                         onclick="location.href='/calendar/create'">新規登録</button>
-                    <button type="button" class="btn btn-def my-2 mx-1" style="width: 150px">選択行コピー</button>
+                    <button type="submit" class="btn btn-def my-2 mx-1" style="width: 150px"
+                        formaction="/calendar/copy">選択行コピー</button>
                     <button type="submit" id="delete" class="btn btn-def my-2 mx-1" style="width: 150px"
                         formaction="/calendar/delete">選択行削除</button>
 
@@ -335,7 +336,8 @@
                                 </div>
                                 <div class="col-5 text-start">
                                     <th:block th:if="${next_page != pageNumber && session.pageList.size() != 0}">
-                                        <a class="mx-3" th:href="@{/calendar/pageList(pageNumber=${next_page})}">次のページ　→</a>
+                                        <a class="mx-3"
+                                            th:href="@{/calendar/pageList(pageNumber=${next_page})}">次のページ　→</a>
                                     </th:block>
                                 </div>
                             </div>
