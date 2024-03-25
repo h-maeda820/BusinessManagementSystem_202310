@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link href="../css/bootstrap/bootstrap.min.css" rel="stylesheet" type="text/css">
+	<link href="../css/index.css" rel="stylesheet" type="text/css">
+	<link th:href="@{../css/menu.css}" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@latest/dist/plugins/monthSelect/style.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
+	<link
+		href="https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Round|Material+Icons+Sharp|Material+Icons+Two+Tone"
+		rel="stylesheet">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+	<script src="../js/index.js"></script>
+	<title>WHC:顧客マスタ登録</title>
+</head>
+
+<body>
+	<!--tymeleafでheader.html呼び出し-->
+	<header th:replace="~{header :: header}"></header>
+
+	<div class="d-flex flex-row" style="height: 1000px">
+		<!-- メニュー表示 -->
+		<div th:replace="~{menu::menu}"></div>
+		<main class="w-100 h-100 bg-light">
+			<form method="post" th:object="${clientData}">
+				<div class="container bg-white border py-3 my-3" style="max-width: 850px">
+					<!-- 各注意文を表示する-->
+					<div class="text-danger" th:text="${error}"></div>
+					<div class="text-danger" th:text="${error2}"></div>
+					<div class="text-danger" th:text="${error3}"></div>
+					<div class="text-danger" th:text="${result}"></div>
+					<div class="text-danger" th:errors="*{client_id}"></div>
+					<div class="text-danger" th:errors="*{client_name}"></div>
+					<div class="text-danger" th:errors="*{open_time}"></div>
+					<div class="text-danger" th:errors="*{close_time}"></div>
+					<div class="text-danger" th:errors="*{working_time}"></div>
+					<div class="text-danger" th:errors="*{rest1_start}"></div>
+					<div class="text-danger" th:errors="*{rest1_end}"></div>
+					<div class="text-danger" th:errors="*{rest2_start}"></div>
+					<div class="text-danger" th:errors="*{rest2_end}"></div>
+					<div class="text-danger" th:errors="*{rest3_start}"></div>
+					<div class="text-danger" th:errors="*{rest3_end}"></div>
+					<div class="text-danger" th:errors="*{rest4_start}"></div>
+					<div class="text-danger" th:errors="*{rest4_end}"></div>
+					<div class="text-danger" th:errors="*{rest5_start}"></div>
+					<div class="text-danger" th:errors="*{rest5_end}"></div>
+					<div class="text-danger" th:errors="*{rest6_start}"></div>
+					<div class="text-danger" th:errors="*{rest6_end}"></div>
+					<div class="text-danger" th:errors="*{adjust_rest_time_start}"></div>
+					<div class="text-danger" th:errors="*{adjust_rest_time_end}"></div>
+					<div class="text-danger" th:errors="*{comment}"></div>
+					<div class="input-group mb-3" style="max-width: 800px">
+
+						<span class="input-group-text">顧客番号</span>
+						<!--新規登録-->
+						<input type="text" aria-label="emNo" class="form-control" style="width: 150px" name="client_id"
+							th:value="*{client_id}" th:if="${!editJudge}">
+						<!--編集-->
+						<input type="text" aria-label="emNo" class="form-control" style="width: 150px" name="client_id"
+							th:value="${client_list.client_id}" th:if="${editJudge}" readonly>
+						<span class="input-group-text">顧客名</span>
+						<!--新規登録-->
+						<input type="text" aria-label="emNo" class="form-control" style="width: 150px"
+							th:value="*{client_name}" name="client_name" th:if="${!editJudge}">
+						<!--編集-->
+						<input type="text" class="form-control" style="width: 150px" name="client_name"
+							th:value="${client_list.client_name}" th:if="${editJudge}" readonly>
+
+					</div>
+
+					<div class="input-group mb-3" style="max-width: 800px">
+						<span class="input-group-text">始業時刻</span>
+						<!--新規登録-->
+						<input type="time" name="open_time" th:if="${!editJudge}" th:value="*{open_time}">
+						<!--編集-->
+						<input type="time" name="open_time" th:value="${client_list.open_time}" th:if="${editJudge}">
+						<span class="input-group-text">就業時刻</span>
+						<!--新規登録-->
+						<input type="time" name="close_time" th:if="${!editJudge}" th:value="*{close_time}">
+						<!--編集-->
+						<input type="time" name="close_time" th:value="${client_list.close_time}" th:if="${editJudge}">
+						<span class="input-group-text">作業時間</span>
+						<!--新規登録-->
+						<input type="text" name="working_time" th:if="${!editJudge}" th:value="*{working_time}">
+						<!--編集-->
+						<input type="text" name="working_time" th:value="${client_list.working_time}"
+							th:if="${editJudge}">
+						<span class="input-group-text">時間</span>
+					</div>
+
+					<div class="input-group mb-3" style="max-width: 500px">
+						<span class="input-group-text">休憩1</span>
+						<span class="input-group-text">開始</span>
+						<!--新規登録-->
+						<input type="time" name="rest1_start" th:if="${!editJudge}" th:value="*{rest1_start}">
+						<!--編集-->
+						<input type="time" name="rest1_start" th:value="${client_list.rest1_start}"
+							th:if="${editJudge}">
+						<span class="input-group-text">～</span>
+						<span class="input-group-text">終了</span>
+						<!--新規登録-->
+						<input type="time" name="rest1_end" th:if="${!editJudge}" th:value="*{rest1_end}">
+						<!--編集-->
+						<input type="time" name="rest1_end" th:value="${client_list.rest1_end}" th:if="${editJudge}">
+					</div>
+					<div class="input-group mb-3" style="width: 500px">
+						<span class="input-group-text">休憩2</span>
+						<span class="input-group-text">開始</span>
+						<!--新規登録-->
+						<input type="time" name="rest2_start" th:if="${!editJudge}" th:value="*{rest2_start}">
+						<!--編集-->
+						<input type="time" name="rest2_start" th:value="${client_list.rest2_start}"
+							th:if="${editJudge}">
+						<span class="input-group-text">～</span>
+						<span class="input-group-text">終了</span>
+						<!--新規登録-->
+						<input type="time" name="rest2_end" th:if="${!editJudge}" th:value="*{rest2_end}">
+						<!--編集-->
+						<input type="time" name="rest2_end" th:value="${client_list.rest2_end}" th:if="${editJudge}">
+					</div>
+					<div class="input-group mb-3" style="width: 500px">
+						<span class="input-group-text">休憩3</span>
+						<span class="input-group-text">開始</span>
+						<!--新規登録-->
+						<input type="time" name="rest3_start" th:if="${!editJudge}" th:value="*{rest3_start}">
+						<!--編集-->
+						<input type="time" name="rest3_start" th:value="${client_list.rest3_start}"
+							th:if="${editJudge}">
+						<span class="input-group-text">～</span>
+						<span class="input-group-text">終了</span>
+						<!--新規登録-->
+						<input type="time" name="rest3_end" th:if="${!editJudge}" th:value="*{rest3_end}">
+						<!--編集-->
+						<input type="time" name="rest3_end" th:value="${client_list.rest3_end}" th:if="${editJudge}">
+					</div>
+					<div class="input-group mb-3" style="width: 500px">
+						<span class="input-group-text">休憩4</span>
+						<span class="input-group-text">開始</span>
+						<!--新規登録-->
+						<input type="time" name="rest4_start" th:if="${!editJudge}" th:value="*{rest4_start}">
+						<!--編集-->
+						<input type="time" name="rest4_start" th:value="${client_list.rest4_start}"
+							th:if="${editJudge}">
+						<span class="input-group-text">～</span>
+						<span class="input-group-text">終了</span>
+						<!--新規登録-->
+						<input type="time" name="rest4_end" th:if="${!editJudge}" th:value="*{rest4_end}">
+						<!--編集-->
+						<input type="time" name="rest4_end" th:value="${client_list.rest4_end}" th:if="${editJudge}">
+					</div>
+					<div class="input-group mb-3" style="width: 500px">
+						<span class="input-group-text">休憩5</span>
+						<span class="input-group-text">開始</span>
+						<!--新規登録-->
+						<input type="time" name="rest5_start" th:if="${!editJudge}" th:value="*{rest5_start}">
+						<!--編集-->
+						<input type="time" name="rest5_start" th:value="${client_list.rest5_start}"
+							th:if="${editJudge}">
+						<span class="input-group-text">～</span>
+						<span class="input-group-text">終了</span>
+						<!--新規登録-->
+						<input type="time" name="rest5_end" th:if="${!editJudge}" th:value="*{rest5_end}">
+						<!--編集-->
+						<input type="time" name="rest5_end" th:value="${client_list.rest5_end}" th:if="${editJudge}">
+					</div>
+					<div class="input-group mb-3" style="width: 500px">
+						<span class="input-group-text">休憩6</span>
+						<span class="input-group-text">開始</span>
+						<!--新規登録-->
+						<input type="time" name="rest6_start" th:if="${!editJudge}" th:value="*{rest6_start}">
+						<!--編集-->
+						<input type="time" name="rest6_start" th:value="${client_list.rest6_start}"
+							th:if="${editJudge}">
+						<span class="input-group-text">～</span>
+						<span class="input-group-text">終了</span>
+						<!--新規登録-->
+						<input type="time" name="rest6_end" th:if="${!editJudge}" th:value="*{rest6_end}">
+						<!--編集-->
+						<input type="time" name="rest6_end" th:value="${client_list.rest6_end}" th:if="${editJudge}">
+					</div>
+					<div class="input-group mb-3" style="width: 500px">
+						<span class="input-group-text">調整休憩時間</span>
+						<span class="input-group-text">開始</span>
+						<!--新規登録-->
+						<input type="time" name="adjust_rest_time_start" th:if="${!editJudge}"
+							th:value="*{adjust_rest_time_start}">
+						<!--編集-->
+						<input type="time" name="adjust_rest_time_start"
+							th:value="${client_list.adjust_rest_time_start}" th:if="${editJudge}">
+						<span class="input-group-text">～</span>
+						<span class="input-group-text">終了</span>
+						<!--新規登録-->
+						<input type="time" name="adjust_rest_time_end" th:if="${!editJudge}"
+							th:value="*{adjust_rest_time_end}">
+						<!--編集-->
+						<input type="time" name="adjust_rest_time_end" th:value="${client_list.adjust_rest_time_end}"
+							th:if="${editJudge}">
+					</div>
+					<p>備考</p>
+					<!--新規登録-->
+					<textarea style="width: 100%; height: 150px;" name="comment" th:if="${!editJudge}"
+						th:value="*{comment}"></textarea>
+					<!--編集-->
+					<textarea style="width: 100%; height: 150px;" name="comment" th:value="${client_list.comment}"
+						th:if="${editJudge}"></textarea>
+					<button id="regist" type="submit" class="btn border border-dark mb-3 my-3"
+						style="color: white; background-color: cornflowerblue;" name="buttonType" value="regist"
+						formaction="/client/regist" th:if="${!editJudge}">登録</button>
+					<button id="edit" type="submit" class="btn border border-dark mb-3 my-3"
+						style="color: white; background-color: cornflowerblue;" formaction="/client/edit"
+						th:if="${editJudge}">更新</button>
+					<button id="regist2" type="submit" class="btn border border-dark mb-3 my-3"
+						style="color: white; background-color: cornflowerblue;" name="buttonType" value="registNext"
+						formaction="/client/regist" th:if="${!editJudge}">登録して次へ</button>
+					<button id="delete" type="submit" class="btn border border-dark mb-3 my-3"
+						style="color: white; background-color: cornflowerblue;" formaction="/client/edit/delete"
+						th:if="${editJudge}">削除</button>
+					<button id="cancel" type="submit" class="btn border border-dark mb-3 my-3"
+						style="color: white; background-color: cornflowerblue;" name="buttonType"
+						value="exclusiveCheck">キャンセル</button>
+				</div>
+
+				<input type="hidden" name="editJudge" th:value="${editJudge}">
+			</form>
+		</main>
+	</div>
+	<script>
+		$('#regist').click(function () {
+
+			if (confirm('入力内容で登録します。よろしいですか？')) {
+				var form = $(this).parents('form');
+				form.attr('buttonType', '/client/list');
+				form.submit();
+			} else {
+				return false;
+			}
+		});
+	</script>
+	<script>
+		$('#regist2').click(function () {
+
+			if (confirm('入力内容で登録し、引き続き新規登録を行います。よろしいですか。')) {
+				var form = $(this).parents('form');
+				form.attr('buttonType', '/client/regist');
+				form.submit();
+			} else {
+				return false;
+			}
+		});
+	</script>
+	<script>
+		$('#edit').click(function () {
+
+			if (confirm('現在の入力内容で更新します。よろしいですか。')) {
+				var form = $(this).parents('form');
+				form.attr('buttonType', '/client/list');
+				form.submit();
+			} else {
+				return false;
+			}
+		});
+	</script>
+	<script>
+		$('#delete').click(function () {
+
+			if (confirm('選択したデータを削除します。よろしいですか。')) {
+				var form = $(this).parents('form');
+				form.attr('buttonType', '/client/list');
+				form.submit();
+			} else {
+				return false;
+			}
+		});
+		//キャンセルボタン
+		$('#cancel').click(function (event) {
+
+			var isConfirmed = false;
+
+			//ダイアログを表示
+			isConfirmed = confirm("現在の入力内容を破棄して、画面遷移します。よろしいですか？");
+
+			//ユーザーがOKをクリックした場合の処理
+			if (isConfirmed) {
+				//画面遷移
+				event.preventDefault();
+				var form = $(this).closest('form');
+				form.attr('action', '/client/cancel');
+				form.submit();
+			} else {
+				// キャンセルが選択された場合
+				return false;
+			}
+
+		});
+	</script>
+
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script src="../js/bootstrap/bootstrap.min.js"></script>
+	<script src="../js/menu.js"></script>
+	<script src="../js/jquery-3.5.1.min.js"></script>
+	<script src="../js/index.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+	<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/flatpickr@latest/dist/plugins/monthSelect/index.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+		integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+		crossorigin="anonymous"></script>
+	<script>
+		const config = {
+			wrap: true,
+			locale: 'ja',
+			plugins: [
+				new monthSelectPlugin({
+					dateFormat: "Y年m月度"
+				})
+			]
+		}
+		flatpickr('.flatpickr', config);
+	</script>
+</body>
+
+</html>

@@ -1,0 +1,2 @@
+seq_id,employee_id,yearA,remaind_this_year,remaind_last_year,delete_flg,created_at,created_user,updated_at,updated_user
+1,1,2020-11-01,3,2,1,2023-10-06 09:25:06,1,2023-10-06 09:25:06,1

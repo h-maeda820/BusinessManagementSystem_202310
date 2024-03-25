@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link th:href="@{../css/bootstrap/bootstrap.min.css}" rel="stylesheet" type="text/css">
+	<link th:href="@{../css/index.css}" rel="stylesheet" type="text/css">
+	<link th:href="@{../css/menu.css}" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@latest/dist/plugins/monthSelect/style.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
+	<link
+		href="https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Round|Material+Icons+Sharp|Material+Icons+Two+Tone"
+		rel="stylesheet">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+	<script src="../js/index.js"></script>
+	<title>WHC:顧客マスタ一覧</title>
+</head>
+
+<body>
+	<!--tymeleafでheader.html呼び出し-->
+	<header th:replace="~{header :: header}"></header>
+
+	<div class="d-flex flex-row" style="height: 1000px">
+
+		<div th:replace="~{menu::menu}"></div>
+
+		<main class="w-100 bg-light">
+			<form method="post" form id="selectCheck">
+				<div class="container bg-white border py-3 my-3">
+					<div class="card shadow bg-light">
+						<!-- 各注意文を表示する-->
+						<div class="text-danger" th:text="${result}"></div>
+						<h3 class="font-weight-bold p-2" id="folding">検索条件</h3>
+						<div class="accordion">
+							<div class="card-body p-2" style="display: flex">
+								<div class="input-group mb-2 mx-2">
+									<span class="input-group-text">顧客番号</span>
+									<input type="text" aria-label="emNo" class="form-control" style="width: 100px"
+										name="client_id" th:value="${client_id}">
+									<span class="input-group-text">顧客名</span>
+									<input type="text" class="form-control" style="width: 200px;" name="client_name"
+										th:value="${client_name}">
+									<button type="submit" class="btn btn-success border border-dark mb-2 mx-2"
+										style="color: white; background-color: cornflowerblue;"
+										formaction="/client/search">検索</button>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- 登録、削除ボタン -->
+					<div class="card-body p-2" style="display: flex">
+						<button type="button" class="btn btn-success border border-dark mb-2 mx-2"
+							style="color: white; background-color: cornflowerblue;"
+							onclick="location.href='/client/regist'">新規登録</button>
+						<button type="submit" id="delete" class="btn btn-success border border-dark mb-2 mx-2"
+							style="color: white; background-color: cornflowerblue;"
+							formaction="/client/list/delete">選択行削除</button>
+					</div>
+
+					<!-- 一覧 -->
+					<div class="text-nowrap table-responsive" id="listLimit" style="overflow-x:scroll;">
+						<table class="table table-sm table-striped table-bordered">
+							<thead>
+								<tr bgcolor="royalblue" class="text-center" style="color: white" id="listTable">
+									<th scope="col" style="width: 20px"><input type="checkbox" disabled
+											checked='checked'></th>
+									<th scope="col" style="width: 45px">顧客番号</th>
+									<th scope="col" style="width: 120px">顧客名</th>
+									<th scope="col">始業時刻</th>
+									<th scope="col">就業時刻</th>
+									<th scope="col">作業時間</th>
+									<th scope="col">休憩1<br>開始</th>
+									<th scope="col">休憩1<br>終了</th>
+									<th scope="col">休憩2<br>開始</th>
+									<th scope="col">休憩2<br>終了</th>
+									<th scope="col">休憩3<br>開始</th>
+									<th scope="col">休憩3<br>終了</th>
+									<th scope="col">休憩4<br>開始</th>
+									<th scope="col">休憩4<br>終了</th>
+									<th scope="col">休憩5<br>開始</th>
+									<th scope="col">休憩5<br>終了</th>
+									<th scope="col">休憩6<br>開始</th>
+									<th scope="col">休憩6<br>終了</th>
+									<th scope="col">調整休憩時間<br>開始</th>
+									<th scope="col">調整休憩時間<br>終了</th>
+									<th scope="col">備考</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="item:${client_list}">
+									<th scope="col" style="width: 20px"><input type="checkbox"
+											th:value="${item.client_id}" id="client_id" name="selectCheck"
+											form="selectCheck"></th>
+									<th scope="col" style="width: 45px ;font-weight:normal;" th:text="${item.client_id}"
+										name="client_id">
+									</th>
+									<th scope="col" style="width: 120px;font-weight:normal;" class="position-relative">
+										<a th:href="@{/client/edit?id={client_id}(client_id=${item.client_id})}"
+											class="stretched-link" th:text="${item.client_name}"
+											th:value="${item.client_id}" name="client_name"></a>
+									</th>
+									<th scope="col" style="font-weight:normal" th:text="${item.open_time}"></th>
+									<th scope="col" style="font-weight:normal" th:text="${item.close_time}"></th>
+									<th scope="col" style="font-weight:normal" th:text="${item.working_time}"></th>
+									<th scope="col" style="font-weight:normal" th:text="${item.rest1_start}"></th>
+									<th scope="col" style="font-weight:normal" th:text="${item.rest1_end}"></th>
+									<th scope="col" style="font-weight:normal" th:text="${item.rest2_start}"></th>
+									<th scope="col" style="font-weight:normal" th:text="${item.rest2_end}"></th>
+									<th scope="col" style="font-weight:normal" th:text="${item.rest3_start}"> </th>
+									<th scope="col" style="font-weight:normal" th:text="${item.rest3_end}"> </th>
+									<th scope="col" style="font-weight:normal" th:text="${item.rest4_start}"> </th>
+									<th scope="col" style="font-weight:normal" th:text="${item.rest4_end}"> </th>
+									<th scope="col" style="font-weight:normal" th:text="${item.rest5_start}"> </th>
+									<th scope="col" style="font-weight:normal" th:text="${item.rest5_end}"> </th>
+									<th scope="col" style="font-weight:normal" th:text="${item.rest6_start}"> </th>
+									<th scope="col" style="font-weight:normal" th:text="${item.rest6_end}"> </th>
+									<th scope="col" style="font-weight:normal" th:text="${item.adjust_rest_time_start}">
+									</th>
+									<th scope="col" style="font-weight:normal" th:text="${item.adjust_rest_time_end}">
+									</th>
+									<th scope="col" style="font-weight:normal" th:text="${item.comment}"> </th>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+
+					<th:block th:if="${pageDisplay == true}">
+						<div class="container">
+							<div class="row">
+								<div class="col-5 text-end">
+									<th:block th:if="${pageNumber > 1}">
+										<a class="mx-3"
+											th:href="@{/client/pageList(pageNumber=${previous_page})}">←　前のページ</a>
+									</th:block>
+								</div>
+								<div class="col-2 text-center">
+									<th:block th:if="${session.pageList2 == null}">
+										<span th:each="page,stat :${session.pageList}">
+											<th:block th:if="${stat.count < 4}">
+												<a class="mx-1" name="pageNumber" th:text="${page}"
+													th:href="@{/client/pageList(pageNumber=${page})}"></a>
+											</th:block>
+											<th:block th:if="${stat.count == 4 && session.pageList.size() > 4}">
+												<span><a href="#" onclick="return false;">...</a></span>
+											</th:block>
+											<th:block th:if="${stat.count == stat.size && stat.size > 3}">
+												<a class="mx-1" name="pageNumber" th:text="${page}"
+													th:href="@{/client/pageList(pageNumber=${page})}"></a>
+											</th:block>
+										</span>
+									</th:block>
+									<th:block th:if="${session.pageList2 != null}">
+										<span th:each="page,stat :${session.pageList2}">
+											<th:block th:if="${pageNumber > 1 && stat.count == 1}">
+												<a class="mx-1" name="pageNumber" th:text="1"
+													th:href="@{/client/pageList(pageNumber=${1})}"></a>
+											</th:block>
+											<th:block
+												th:if="${stat.count == 1 &&  pageNumber > 3 && session.pageList.size() > 4}">
+												<span><a href="#" onclick="return false;">...</a></span>
+											</th:block>
+											<th:block th:if="${stat.count < 4}">
+												<a class="mx-1" name="pageNumber" th:text="${page}"
+													th:href="@{/client/pageList(pageNumber=${page})}"></a>
+											</th:block>
+											<th:block
+												th:if="${stat.count == 4 &&  pageNumber < session.pageList.size() -2 && session.pageList.size() > 4}">
+												<span><a href="#" onclick="return false;">...</a></span>
+											</th:block>
+											<th:block th:if="${stat.count == stat.size && stat.size > 3}">
+												<a class="mx-1" name="pageNumber" th:text="${page}"
+													th:href="@{/client/pageList(pageNumber=${page})}"></a>
+											</th:block>
+										</span>
+									</th:block>
+								</div>
+								<div class="col-5 text-start">
+									<th:block th:if="${next_page != pageNumber && session.pageList.size() != 0}">
+										<a class="mx-3" th:href="@{/client/pageList(pageNumber=${next_page})}">次のページ　→</a>
+									</th:block>
+								</div>
+							</div>
+						</div>
+						<input type="hidden" name="pageNumber" th:value="${pageNumber}">
+					</th:block>
+			</form>
+		</main>
+	</div>
+	<script>
+		$('#delete').click(function () {
+
+			if (confirm('選択したデータを削除します。よろしいですか。')) {
+				var form = $(this).parents('form');
+				form.attr('action', '/client/list');
+				form.submit();
+			} else {
+				return false;
+			}
+		});
+	</script>
+	<script>
+		// bootstrapのvalidation定義
+		// Example starter JavaScript for disabling form submissions if there are invalid fields
+		(function () {
+			'use strict';
+			window.addEventListener('load', function () {
+				// Fetch all the forms we want to apply custom Bootstrap validation styles to
+				var forms = document.getElementsByClassName('needs-validation');
+				// Loop over them and prevent submission
+				var validation = Array.prototype.filter.call(forms, function (form) {
+					form.addEventListener('submit', function (event) {
+						if (form.checkValidity() === false) {
+							event.preventDefault();
+							event.stopPropagation();
+						}
+						form.classList.add('was-validated');
+					}, false);
+				});
+			}, false);
+		})();
+	</script>
+	<script>
+		//一覧画面のダブルクリック時行の社員IDを保持して編集画面へ遷移
+		document.addEventListener("DOMContentLoaded", function () {
+			// 顧客選択ダイアログ内の各行に対してクリックイベントを設定
+			var rows = document.querySelectorAll("#listLimit tbody tr");
+
+			rows.forEach(function (row) {
+
+				row.addEventListener("dblclick", function () {
+
+					// クリックされた行から顧客番号と顧客名を取得
+					var clientId = $('input[id="client_id"]').val();
+
+					//ダブルクリック後の遷移先をgetに変更					
+					var url = "/client/edit?id=" + clientId;
+
+					window.location.href = url;
+				});
+
+			});
+		});
+	</script>
+	<script src="../js/bootstrap/bootstrap.min.js"></script>
+	<script src="../js/menu.js"></script>
+	<script src="../js/jquery-3.5.1.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+		integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+		crossorigin="anonymous"></script>
+</body>
+
+</html>

@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link href="../static/css/bootstrap/bootstrap.min.css" rel="stylesheet" type="text/css">
+	<link href="../static/css/index.css" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+	<link th:href="@{../static/css/menu.css}" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@latest/dist/plugins/monthSelect/style.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
+	<link
+		href="https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Round|Material+Icons+Sharp|Material+Icons+Two+Tone"
+		rel="stylesheet">
+	<link href="../css/SMSEM001.css" rel="stylesheet" type="text/css">
+	<link th:href="@{../css/menu.css}" rel="stylesheet" type="text/css">
+	<link th:href="@{..//css/bootstrap/bootstrap.min.css}" rel="stylesheet" type="text/css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<script src="../js/index.js"></script>
+	<style>
+		/* モーダルCSS */
+		/* ダイアログ用CSS */
+		.modalArea {
+			position: fixed;
+			z-index: 10;
+
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+		}
+
+		.clientModal {
+			display: none;
+		}
+
+		.employeeModal {
+			display: none;
+		}
+
+		.listScroll {
+			height: 500px;
+			overflow: auto;
+		}
+
+		.modalBg {
+			width: 100%;
+			height: 100%;
+			background-color: rgba(30, 30, 30, 0.9);
+		}
+
+		.modalWrapper {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			width: 70%;
+			height: auto;
+			max-width: 1000px;
+			padding: 10px 30px;
+			background-color: #fff;
+		}
+
+		.closeModal {
+			position: absolute;
+			top: 0.5rem;
+			right: 1rem;
+			cursor: pointer;
+		}
+
+		.top-margin10 {
+			margin-top: 10px;
+		}
+
+		.top-margin5 {
+			margin-top: 5px;
+		}
+	</style>
+
+	<title>WHC:社員マスタ登録</title>
+</head>
+
+<body>
+
+	<!--tymeleafでheader.html呼び出し-->
+	<header th:replace="~{header :: header}"></header>
+	<!--tymeleafでmenu.html呼び出し-->
+	<div th:replace="~{menu::menu}"></div>
+
+	<input type="hidden" id="clientDialog" th:value="${clientDialog}">
+	<input type="hidden" name="edit" th:value="${edit}">
+	<input type="hidden" id="registMode" th:value="${registMode}">
+	<input type="hidden" id="searchPage" th:value="${searchPage}">
+
+	<div class="d-flex flex-row" style="height: 1000px">
+		<main class="w-100 h-100 bg-light">
+			<div class="container bg-white border py-3 my-3" style="width: 850px">
+
+				<form method="post" th:object="${employeeDate}">
+					<!-- 顧客選択ダイアログ -->
+					<section id="clientModal" class="modalArea clientModal">
+						<div id="modalBg" class="modalBg"></div>
+						<div class="modalWrapper">
+							<div class="modalContents">
+								<div class="card shadow bg-light top-margin10">
+									<div class="card-body p-2" style="display: flex">
+										<div class="input-group mb-2 mx-2 top-margin5">
+											<span class="input-group-text">顧客番号</span>
+											<input type="text" name="dialogClientId"
+												th:value="${selectDialogForm != null ? (selectDialogForm.dialogClientId != null ? selectDialogForm.dialogClientId : '') : ''}"
+												id="searchClientId" class="form-control">
+										</div>
+										<div class="input-group mb-2 mx-2 top-margin5">
+											<span class="input-group-text">顧客名</span>
+											<input type="text" name="dialogClientName"
+												th:value="${selectDialogForm != null ? (selectDialogForm.dialogClientName != null ? selectDialogForm.dialogClientName : '') : ''}"
+												id="searchClientName" class="form-control">
+										</div>
+										<div class="top-margin5">
+											<button type="submit" name="dialogSearchClient" value="open"
+												id="searchClientButton"
+												class="btn btn-def mb-1 mx-2 loadDialog">検索</button>
+										</div>
+									</div>
+								</div>
+								<div class="top-margin10 listScroll">
+									<table class="table table-sm table-striped table-bordered text-center mt-0">
+										<thead>
+											<tr bgcolor="royalblue" style="color: white">
+												<th scope="col" style="width: 45px">顧客<br>番号</th>
+												<th scope="col" style="width: 170px">顧客名</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr th:each="item:${client_list}">
+												<td th:text="${item.client_id}"></td>
+												<td th:text="${item.client_name}"></td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+								<div class="card-body ps-2 pt-0">
+									<button type="button" id="selectClient"
+										class="btn btn-def mb-1 mx-2 top-margin10">選択</button>
+								</div>
+
+							</div>
+							<div id="closeModal" class="closeModal">
+								×
+							</div>
+						</div>
+					</section>
+					<!-- 顧客選択ダイアログここまで -->
+
+
+					<!--エラーメッセージhasErrorsはバリデーション、その他はコントローラクラスで条件指定-->
+					<div class="text-danger" th:text="${duplicationEmpIdName}"></div>
+					<div class="text-danger" th:if="${#fields.hasErrors('employeeId')}"
+						th:errors="${employeeDate.employeeId}"></div>
+					<div class="text-danger" th:text="${duplicationEmployeeId}"></div>
+					<div class="text-danger" th:if="${#fields.hasErrors('employeeName')}"
+						th:errors="${employeeDate.employeeName}"></div>
+					<div class="text-danger" th:text="${duplicationEmployeeName}"></div>
+					<div class="text-danger" th:if="${#fields.hasErrors('clientId')}"
+						th:errors="${employeeDate.clientId}"></div>
+					<div class="text-danger" th:if="${#fields.hasErrors('paidHolidayStd')}"
+						th:errors="${employeeDate.paidHolidayStd}"></div>
+					<div class="text-danger" th:text="${dResultPaidHolidayStd}"></div>
+					<div class="text-danger" th:if="${#fields.hasErrors('remaindThisYear')}"
+						th:errors="${employeeDate.remaindThisYear}"></div>
+					<div class="text-danger" th:if="${#fields.hasErrors('remaindLastYear')}"
+						th:errors="${employeeDate.remaindLastYear}"></div>
+					<div class="text-danger" th:text="${result}"></div>
+
+					<!--1行目、新規登録時は空、更新モード時は各情報を表示(更新モード時はreadonlyで編集不可)-->
+					<div class="input-group mb-3" style="width: 600px">
+						<span class="input-group-text">社員番号</span>
+						<input type="text" aria-label="emNo" class="form-control" name="employeeId"
+							th:value="*{employeeId}" style="width: 150px" th:readonly="${registMode == null}">
+						<span class="input-group-text">社員氏名</span>
+						<input type="text" class="form-control" name="employeeName" th:value="*{employeeName}"
+							style="width: 150px" th:readonly="${registMode == null}">
+					</div>
+
+					<!--2行目、新規登録時は空、更新モード時は各情報を表示(更新モード時はreadonlyで編集不可)-->
+					<div class="input-group mb-3" style="width: 800px">
+						<span class="input-group-text">担当顧客番号</span>
+						<input type="text" aria-label="emNo" class="form-control" name="clientId" th:value="*{clientId}"
+							style="width: 150px" id="clientId">
+						<span class="input-group-text">担当顧客名</span>
+						<input type="text" class="form-control" style="width: 150px" id="clientName" name="clientName"
+							th:value="*{clientName}">
+
+						<button type="button" class="btn btn-success border border-dark mb-2 mx-2"
+							style="color: white; background-color: cornflowerblue" id="openClientModal">顧客選択</button>
+					</div>
+
+
+					<!--3行目、新規登録時はチェックなしで表示(更新モード時はtrueならチェックを付けた状態で表示)-->
+					<div class="input-group mb-3" style="width: 600px">
+						<input type="checkbox" id="inlineCheckbox1" name="hourlyWage" th:checked="*{hourlyWage}">
+						<label class="form-check-label" for="inlineCheckbox1">時給</label>
+					</div>
+
+					<!--4行目、新規登録時は空表示(更新モード時は情報を表示)-->
+					<div class="input-group mb-3" style="width: 300px">
+						<span class="input-group-text">有給基準日</span>
+						<input type="text" aria-label="emNo" class="form-control" name="paidHolidayStd"
+							th:value="*{paidHolidayStd}" style="width: 150px" id="paidHolidayStd"
+							onchange="calculatePaidLeave()">
+					</div>
+
+					<!--5行目、新規登録時は空表示(更新モード時は各情報を表示)-->
+					<div class="input-group mb-3" style="width: 700px">
+						<span class="input-group-text" style="width: 100px">有給残日数</span>
+						<span class="input-group-text">当年度分</span>
+						<input type="text" aria-label="emNo" class="form-control" name="remaindThisYear"
+							th:value="*{remaindThisYear}" style="width: 150px" id="paidLeaveDays">
+						<span class="input-group-text" style="width: 40px">日</span>
+						<span class="input-group-text">前年度分</span>
+						<input type="text" aria-label="emNo" class="form-control" name="remaindLastYear"
+							th:value="*{remaindLastYear}" style="width: 150px">
+						<span class="input-group-text" style="width: 40px">日</span>
+					</div>
+
+					<!--6行目、実装なし-->
+					<div class="input-group mb-3" style="width: 350px">
+						<span class="input-group-text">有給取得日数</span>
+						<input type="text" aria-label="emNo" class="form-control" name="holidayCount"
+							th:value="*{holidayCount}" readonly style="width: 150px">
+						<span class="input-group-text" style="width: 40px">日</span>
+					</div>
+
+					<!--7行目、実装なし-->
+					<div class="input-group mb-3" style="width: 350px">
+						<span class="input-group-text">ステータス</span>
+						<input type="text" aria-label="emNo" class="form-control" name="status" th:value="${status}"
+							readonly style="width: 150px">
+					</div>
+
+					<!--ここから各ボタン、name="actionでRequestParam"、valueでどのボタンを押下したか判断させる-->
+					<!--登録ボタン、formへ送る際registにpostする(新規登録モード時は表示)-->
+					<button id="regist" name="action" value="regist" type="submit"
+						class="btn border border-dark mb-3 my-3" style="color: white; background-color: cornflowerblue;"
+						formaction="/employee/regist"
+						th:if="${employeeId == null and registMode != null or regist != null or registNext != null}">登録</button>
+
+					<!--更新ボタン、formへ送る際editにpostする(更新モード時は表示)-->
+					<button id="update" name="action" value="edit" type="submit"
+						class="btn border border-dark mb-3 my-3" style="color: white; background-color: cornflowerblue;"
+						formaction="/employee/edit"
+						th:if="${employeeId != null and registMode == null or edit != null}">更新</button>
+
+					<!--登録して次へボタン、formへ送る際registにpostする(新規登録モード時は表示)-->
+					<button id="regist2" name="action" value="registNext" type="submit"
+						class="btn border border-dark mb-3 my-3" style="color: white; background-color: cornflowerblue;"
+						formaction="/employee/regist"
+						th:if="${employeeId == null and registMode != null or regist != null or registNext != null}">登録して次へ</button>
+
+					<!--削除ボタン、formへ送る際deleteにpostする(更新モード時は表示)-->
+					<button id="delete" name="action" value="delete" type="submit"
+						class="btn border border-dark mb-3 my-3" style="color: white; background-color: cornflowerblue;"
+						formaction="/employee/delete"
+						th:if="${employeeId != null and registMode == null or edit != null}">削除</button>
+
+					<!--キャンセルボタン、formへ送る際listにpostする(常に表示)-->
+					<button id="cancel" name="action" value="cancel" type="submit"
+						class="btn border border-dark mb-3 my-3" formaction="/employee/list"
+						style="color: white; background-color: cornflowerblue;">キャンセル</button>
+
+				</form>
+			</div>
+		</main>
+	</div>
+
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script src="../js/SMSEM002.js"></script>
+	<script src="../js/bootstrap.bundle.min.js"></script>
+	<script src="../js/index.js"></script>
+	<script src="../js/menu.js"></script>
+	<script src="../js/bootstrap/bootstrap.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+	<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/flatpickr@latest/dist/plugins/monthSelect/index.js"></script>
+	<script>
+
+		//ここからダイアログ表示
+		//削除ボタン押下時ダイアログを表示
+		$('#delete').click(function () {
+			if (confirm('選択したデータを削除します。よろしいですか。')) {
+				var form = $(this).closest('form'); // .parents() を .closest() に変更
+				form.attr('action', '/employee/delete');
+				form.submit();
+			} else {
+				return false;
+			}
+		});
+
+		//登録ボタン押下時ダイアログを表示
+		$('#regist').click(function () {
+			if (confirm('入力内容で登録します。よろしいですか。')) {
+				var form = $(this).closest('form'); // .parents() を .closest() に変更
+				form.attr('action', '/employee/regist');
+				form.submit();
+			} else {
+				return false;
+			}
+		});
+
+
+		$('#regist2').click(function () {
+
+			if (confirm('入力内容で登録し、引き続き新規登録を行います。よろしいですか？')) {
+				var form = $(this).parents('form');
+				form.attr('buttonType', '/employee/regist');
+				form.submit();
+			} else {
+				return false;
+			}
+		});
+
+
+		//更新ボタン押下時ダイアログを表示
+		$('#update').click(function () {
+			if (confirm('入力内容で更新します。よろしいですか。')) {
+				var form = $(this).closest('form'); // .parents() を .closest() に変更
+				form.attr('action', '/employee/update');
+				form.submit();
+			} else {
+				return false;
+			}
+		});
+
+		// 戻るクリックでJS追加、ダイアログ
+		$('#cancel').click(function (event) {
+
+			var isConfirmed = false;
+
+			//ダイアログを表示
+			isConfirmed = confirm("現在の入力内容を破棄して、画面遷移します。よろしいですか。");
+			//ユーザーがOKをクリックした場合の処理
+			if (isConfirmed) {
+				//画面遷移
+				event.preventDefault();
+				var form = $(this).closest('form');
+				form.attr('action', '/employee/cancel');
+				form.submit();
+			} else {
+				// キャンセルが選択された場合
+				return false;
+			}
+
+		});
+	</script>
+
+	<!-- モーダルウィンドウ用js -->
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<!-- 顧客選択js -->
+	<script>
+		/* 顧客選択↓↓ */
+
+		//検索ボタン押されていたら顧客ダイアログ開く
+		document.addEventListener("DOMContentLoaded", function () {
+			var str = $("#clientDialog").val();
+			if (str == "open") {
+				openClientDialog();
+			}
+		});
+
+		$(function () {
+			$('#openClientModal').click(function () {
+				openClientDialog();
+			});
+			$('#closeModal , #modalBg').click(function () {
+				$('body').css('overflow', 'auto'); //スクロール有効化
+				$('#clientModal').fadeOut();
+			});
+		});
+
+		//表示する
+		function openClientDialog() {
+			$('body').css('overflow', 'hidden'); //スクロール無効化
+			$('#clientModal').fadeIn();
+		}
+
+		//行クリック時
+		document.addEventListener("DOMContentLoaded", function () {
+			// 顧客選択ダイアログ内の各行に対してクリックイベントを設定
+			var rows = document.querySelectorAll("#clientModal tbody tr");
+
+			rows.forEach(function (row) {
+
+				//クリック
+				row.addEventListener("click", function () {
+
+					// クリックされた行の背景色を変更
+					rows.forEach(function (r) {
+						r.style.backgroundColor = ""; // 他の行の背景色をリセット
+					});
+					row.style.backgroundColor = "rgba(169, 169, 169, 0.75)"; // クリックされた行の背景色を変更
+
+					// クリックされた行から顧客番号と顧客名を取得
+					var clientId = row.cells[0].textContent; // 顧客番号のセル
+					var clientName = row.cells[1].textContent; // 顧客名のセル
+
+					// 取得した値を保存
+					selectedClientName = clientName;
+					selectedClientId = clientId;
+				});
+
+				//ダブルクリック
+				row.addEventListener("dblclick", function () {
+
+					// クリックされた行から顧客番号と顧客名を取得
+					var clientId = row.cells[0].textContent; // 顧客番号のセル
+					var clientName = row.cells[1].textContent; // 顧客名のセル
+
+					// もと画面の検索欄に顧客名を設定
+					$('input[id="clientName"]').val(clientName);
+					$('input[id="clientId"]').val(clientId);
+
+					// モーダルを閉じる
+					$('body').css('overflow', 'auto'); // スクロール有効化
+					$('#clientModal').fadeOut();
+				});
+
+			});
+		});
+
+		// モーダルで選択ボタンをクリックしたときの処理
+		$('#selectClient').click(function () {
+			// もと画面の検索欄に顧客名を設定
+			$('input[id="clientName"]').val(selectedClientName);
+			$('input[id="clientId"]').val(selectedClientId);
+
+			// モーダルを閉じる
+			$('body').css('overflow', 'auto'); // スクロール有効化
+			$('#clientModal').fadeOut();
+		});
+
+		//あとで
+		//遷移先を指定
+
+		$('.loadDialog').click(function () {
+			var registMode = $("#registMode").val();
+
+			//新規登録
+			if (registMode == "r") {
+				var form = $(this).closest('form');
+				form.attr('action', '/employee/regist/searchDialog');
+				form.submit();
+			}
+			//編集
+			else {
+				var form = $(this).closest('form');
+				form.attr('action', '/employee/edit/searchDialog');
+				form.submit();
+			}
+
+		});
+	</script>
+
+</body>
+
+</html>

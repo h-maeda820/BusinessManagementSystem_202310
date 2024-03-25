@@ -1,0 +1,2 @@
+seq_id,employee_id,holiday_date,application_date,application_class,day_off_date,day_off_time,start_end_time,reason,remarks,delete_flg,created_at,created_user,updated_at,updated_user
+1,1,2020-11-01,2020-11-01,1,2020-11-01,1,02:00:00,言い訳,ダメ,1,2023-10-06 09:25:06,1,2023-10-06 09:25:06,1

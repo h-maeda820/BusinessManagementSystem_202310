@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link href="../static/css/bootstrap/bootstrap.min.css" rel="stylesheet" type="text/css">
+	<link href="../static/css/index.css" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+	<link th:href="@{../static/css/menu.css}" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@latest/dist/plugins/monthSelect/style.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
+	<link
+		href="https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Round|Material+Icons+Sharp|Material+Icons+Two+Tone"
+		rel="stylesheet">
+	<link th:href="@{../css/menu.css}" rel="stylesheet" type="text/css">
+	<link th:href="@{..//css/bootstrap/bootstrap.min.css}" rel="stylesheet" type="text/css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<script src="../js/index.js"></script>
+
+	<title>WHC:有給休暇帳票</title>
+</head>
+
+<style>
+	td {
+		border: 1px solid black;
+		width: 100px;
+		height: 30px;
+	}
+</style>
+
+<body>
+
+	<!--tymeleafでheader.html呼び出し-->
+	<header th:replace="~{header :: header}"></header>
+	<!--tymeleafでmenu.html呼び出し-->
+	<div th:replace="~{menu::menu}"></div>
+
+	<div class="d-flex flex-row" style="height: 1000px">
+
+		<main class="w-100 bg-light">
+
+			<table style="text-align: center;">
+				<tr style="background-color: #99CCFF;">
+					<td rowspan="2" colspan="2">社員番号</td>
+					<td rowspan="2" colspan="2">社員氏名</td>
+					<td rowspan="2" colspan="2">基準日</td>
+					<td colspan="4">残日数</td>
+				</tr>
+				<tr style="background-color: #99CCFF">
+					<td colspan="2">当年度分</td>
+					<td colspan="2">前年度分</td>
+				</tr>
+				<tr>
+					<td colspan="2" name="employeeId" th:text="${employeeId}"></td>
+					<td colspan="2" 　name="employeeName" th:text="${employeeName}"></td>
+					<td colspan="2" name="paidHolidayStd" th:text="${paidHolidayStd}"></td>
+					<td colspan="2" name="remaindThisYear" th:text="${remaindThisYear}"></td>
+					<td colspan="2" name="remaindLastYear" th:text="${remaindLastYear}"></td>
+				</tr>
+				<tr style="background-color: #99CCFF">
+					<td colspan="10">取得日数・日付</td>
+				</tr>
+
+				<tr>
+					<td colspan="2" style="background-color: #99CCFF">年度</td>
+					<td colspan="3" name="twoYearsAgo" th:text="${twoYearsAgo}"></td>
+					<td colspan="2" style="background-color: #99CCFF">取得日数</td>
+					<td colspan="3" name="countTwoYearsAgo" th:text="${countTwoYearsAgo}"></td>
+				</tr>
+				<tr>
+					<td th:text="${TwoYearsAgoVacation1}"></td>
+					<td th:text="${TwoYearsAgoVacation2}"></td>
+					<td th:text="${TwoYearsAgoVacation3}"></td>
+					<td th:text="${TwoYearsAgoVacation4}"></td>
+					<td th:text="${TwoYearsAgoVacation5}"></td>
+					<td th:text="${TwoYearsAgoVacation6}"></td>
+					<td th:text="${TwoYearsAgoVacation7}"></td>
+					<td th:text="${TwoYearsAgoVacation8}"></td>
+					<td th:text="${TwoYearsAgoVacation9}"></td>
+					<td th:text="${TwoYearsAgoVacation10}"></td>
+				</tr>
+				<tr>
+					<td th:if="${TwoYearsAgoVacation1 != null}">1.0</td>
+					<td th:if="${TwoYearsAgoVacation1 == null}"></td>
+					<td th:if="${TwoYearsAgoVacation2 != null}">1.0</td>
+					<td th:if="${TwoYearsAgoVacation2 == null}"></td>
+					<td th:if="${TwoYearsAgoVacation3 != null}">1.0</td>
+					<td th:if="${TwoYearsAgoVacation3 == null}"></td>
+					<td th:if="${TwoYearsAgoVacation4 != null}">1.0</td>
+					<td th:if="${TwoYearsAgoVacation4 == null}"></td>
+					<td th:if="${TwoYearsAgoVacation5 != null}">1.0</td>
+					<td th:if="${TwoYearsAgoVacation5 == null}"></td>
+					<td th:if="${TwoYearsAgoVacation6 != null}">1.0</td>
+					<td th:if="${TwoYearsAgoVacation6 == null}"></td>
+					<td th:if="${TwoYearsAgoVacation7 != null}">1.0</td>
+					<td th:if="${TwoYearsAgoVacation7 == null}"></td>
+					<td th:if="${TwoYearsAgoVacation8 != null}">1.0</td>
+					<td th:if="${TwoYearsAgoVacation8 == null}"></td>
+					<td th:if="${TwoYearsAgoVacation9 != null}">1.0</td>
+					<td th:if="${TwoYearsAgoVacation9 == null}"></td>
+					<td th:if="${TwoYearsAgoVacation10 != null}">1.0</td>
+					<td th:if="${TwoYearsAgoVacation10 == null}"></td>
+				</tr>
+				<tr>
+					<td th:text="${TwoYearsAgoVacation11}"></td>
+					<td th:text="${TwoYearsAgoVacation12}"></td>
+					<td th:text="${TwoYearsAgoVacation13}"></td>
+					<td th:text="${TwoYearsAgoVacation14}"></td>
+					<td th:text="${TwoYearsAgoVacation15}"></td>
+					<td th:text="${TwoYearsAgoVacation16}"></td>
+					<td th:text="${TwoYearsAgoVacation17}"></td>
+					<td th:text="${TwoYearsAgoVacation18}"></td>
+					<td th:text="${TwoYearsAgoVacation19}"></td>
+					<td th:text="${TwoYearsAgoVacation20}"></td>
+				</tr>
+				<tr>
+					<td th:if="${TwoYearsAgoVacation11 != null}">1.0</td>
+					<td th:if="${TwoYearsAgoVacation11 == null}"></td>
+					<td th:if="${TwoYearsAgoVacation12 != null}">1.0</td>
+					<td th:if="${TwoYearsAgoVacation12 == null}"></td>
+					<td th:if="${TwoYearsAgoVacation13 != null}">1.0</td>
+					<td th:if="${TwoYearsAgoVacation13 == null}"></td>
+					<td th:if="${TwoYearsAgoVacation14 != null}">1.0</td>
+					<td th:if="${TwoYearsAgoVacation14 == null}"></td>
+					<td th:if="${TwoYearsAgoVacation15 != null}">1.0</td>
+					<td th:if="${TwoYearsAgoVacation15 == null}"></td>
+					<td th:if="${TwoYearsAgoVacation16 != null}">1.0</td>
+					<td th:if="${TwoYearsAgoVacation16 == null}"></td>
+					<td th:if="${TwoYearsAgoVacation17 != null}">1.0</td>
+					<td th:if="${TwoYearsAgoVacation17 == null}"></td>
+					<td th:if="${TwoYearsAgoVacation18 != null}">1.0</td>
+					<td th:if="${TwoYearsAgoVacation18 == null}"></td>
+					<td th:if="${TwoYearsAgoVacation19 != null}">1.0</td>
+					<td th:if="${TwoYearsAgoVacation19 == null}"></td>
+					<td th:if="${TwoYearsAgoVacation20 != null}">1.0</td>
+					<td th:if="${TwoYearsAgoVacation20 == null}"></td>
+				</tr>
+				<tr>
+					<td th:text="${TwoYearsAgoVacation21}"></td>
+					<td th:text="${TwoYearsAgoVacation22}"></td>
+					<td th:text="${TwoYearsAgoVacation23}"></td>
+					<td th:text="${TwoYearsAgoVacation24}"></td>
+					<td th:text="${TwoYearsAgoVacation25}"></td>
+					<td th:text="${TwoYearsAgoVacation26}"></td>
+					<td th:text="${TwoYearsAgoVacation27}"></td>
+					<td th:text="${TwoYearsAgoVacation28}"></td>
+					<td th:text="${TwoYearsAgoVacation29}"></td>
+					<td th:text="${TwoYearsAgoVacation30}"></td>
+				</tr>
+				<tr>
+					<td th:if="${TwoYearsAgoVacation21 != null}">1.0</td>
+					<td th:if="${TwoYearsAgoVacation21 == null}"></td>
+					<td th:if="${TwoYearsAgoVacation22 != null}">1.0</td>
+					<td th:if="${TwoYearsAgoVacation22 == null}"></td>
+					<td th:if="${TwoYearsAgoVacation23 != null}">1.0</td>
+					<td th:if="${TwoYearsAgoVacation23 == null}"></td>
+					<td th:if="${TwoYearsAgoVacation24 != null}">1.0</td>
+					<td th:if="${TwoYearsAgoVacation24 == null}"></td>
+					<td th:if="${TwoYearsAgoVacation25 != null}">1.0</td>
+					<td th:if="${TwoYearsAgoVacation25 == null}"></td>
+					<td th:if="${TwoYearsAgoVacation26 != null}">1.0</td>
+					<td th:if="${TwoYearsAgoVacation26 == null}"></td>
+					<td th:if="${TwoYearsAgoVacation27 != null}">1.0</td>
+					<td th:if="${TwoYearsAgoVacation27 == null}"></td>
+					<td th:if="${TwoYearsAgoVacation28 != null}">1.0</td>
+					<td th:if="${TwoYearsAgoVacation28 == null}"></td>
+					<td th:if="${TwoYearsAgoVacation29 != null}">1.0</td>
+					<td th:if="${TwoYearsAgoVacation29 == null}"></td>
+					<td th:if="${TwoYearsAgoVacation30 != null}">1.0</td>
+					<td th:if="${TwoYearsAgoVacation30 == null}"></td>
+				</tr>
+				<tr>
+					<td th:text="${TwoYearsAgoVacation31}"></td>
+					<td th:text="${TwoYearsAgoVacation32}"></td>
+					<td th:text="${TwoYearsAgoVacation33}"></td>
+					<td th:text="${TwoYearsAgoVacation34}"></td>
+					<td th:text="${TwoYearsAgoVacation35}"></td>
+					<td th:text="${TwoYearsAgoVacation36}"></td>
+					<td th:text="${TwoYearsAgoVacation37}"></td>
+					<td th:text="${TwoYearsAgoVacation38}"></td>
+					<td th:text="${TwoYearsAgoVacation39}"></td>
+					<td th:text="${TwoYearsAgoVacation40}"></td>
+				</tr>
+				<tr>
+					<td th:if="${TwoYearsAgoVacation31 != null}">1.0</td>
+					<td th:if="${TwoYearsAgoVacation31 == null}"></td>
+					<td th:if="${TwoYearsAgoVacation32 != null}">1.0</td>
+					<td th:if="${TwoYearsAgoVacation32 == null}"></td>
+					<td th:if="${TwoYearsAgoVacation33 != null}">1.0</td>
+					<td th:if="${TwoYearsAgoVacation33 == null}"></td>
+					<td th:if="${TwoYearsAgoVacation34 != null}">1.0</td>
+					<td th:if="${TwoYearsAgoVacation34 == null}"></td>
+					<td th:if="${TwoYearsAgoVacation35 != null}">1.0</td>
+					<td th:if="${TwoYearsAgoVacation35 == null}"></td>
+					<td th:if="${TwoYearsAgoVacation36 != null}">1.0</td>
+					<td th:if="${TwoYearsAgoVacation36 == null}"></td>
+					<td th:if="${TwoYearsAgoVacation37 != null}">1.0</td>
+					<td th:if="${TwoYearsAgoVacation37 == null}"></td>
+					<td th:if="${TwoYearsAgoVacation38 != null}">1.0</td>
+					<td th:if="${TwoYearsAgoVacation38 == null}"></td>
+					<td th:if="${TwoYearsAgoVacation39 != null}">1.0</td>
+					<td th:if="${TwoYearsAgoVacation39 == null}"></td>
+					<td th:if="${TwoYearsAgoVacation40 != null}">1.0</td>
+					<td th:if="${TwoYearsAgoVacation40 == null}"></td>
+				</tr>
+
+				<tr>
+					<td colspan="2" style="background-color: #99CCFF">年度</td>
+					<td colspan="3" name="twoYearsAgo" th:text="${lastYear}"></td>
+					<td colspan="2" style="background-color: #99CCFF">取得日数</td>
+					<td colspan="3" name="countTwoYearsAgo" th:text="${countLastYear}"></td>
+				</tr>
+				<tr>
+					<td th:text="${lastYearVacation1}"></td>
+					<td th:text="${lastYearVacation2}"></td>
+					<td th:text="${lastYearVacation3}"></td>
+					<td th:text="${lastYearVacation4}"></td>
+					<td th:text="${lastYearVacation5}"></td>
+					<td th:text="${lastYearVacation6}"></td>
+					<td th:text="${lastYearVacation7}"></td>
+					<td th:text="${lastYearVacation8}"></td>
+					<td th:text="${lastYearVacation9}"></td>
+					<td th:text="${lastYearVacation10}"></td>
+				</tr>
+				<tr>
+					<td th:if="${lastYearVacation1 != null}">1.0</td>
+					<td th:if="${lastYearVacation1 == null}"></td>
+					<td th:if="${lastYearVacation2 != null}">1.0</td>
+					<td th:if="${lastYearVacation2 == null}"></td>
+					<td th:if="${lastYearVacation3 != null}">1.0</td>
+					<td th:if="${lastYearVacation3 == null}"></td>
+					<td th:if="${lastYearVacation4 != null}">1.0</td>
+					<td th:if="${lastYearVacation4 == null}"></td>
+					<td th:if="${lastYearVacation5 != null}">1.0</td>
+					<td th:if="${lastYearVacation5 == null}"></td>
+					<td th:if="${lastYearVacation6 != null}">1.0</td>
+					<td th:if="${lastYearVacation6 == null}"></td>
+					<td th:if="${lastYearVacation7 != null}">1.0</td>
+					<td th:if="${lastYearVacation7 == null}"></td>
+					<td th:if="${lastYearVacation8 != null}">1.0</td>
+					<td th:if="${lastYearVacation8 == null}"></td>
+					<td th:if="${lastYearVacation9 != null}">1.0</td>
+					<td th:if="${lastYearVacation9 == null}"></td>
+					<td th:if="${lastYearVacation10 != null}">1.0</td>
+					<td th:if="${lastYearVacation10 == null}"></td>
+
+				</tr>
+				<tr>
+					<td th:text="${lastYearVacation11}"></td>
+					<td th:text="${lastYearVacation12}"></td>
+					<td th:text="${lastYearVacation13}"></td>
+					<td th:text="${lastYearVacation14}"></td>
+					<td th:text="${lastYearVacation15}"></td>
+					<td th:text="${lastYearVacation16}"></td>
+					<td th:text="${lastYearVacation17}"></td>
+					<td th:text="${lastYearVacation18}"></td>
+					<td th:text="${lastYearVacation19}"></td>
+					<td th:text="${lastYearVacation20}"></td>
+				</tr>
+				<tr>
+					<td th:if="${lastYearVacation11 != null}">1.0</td>
+					<td th:if="${lastYearVacation11 == null}"></td>
+					<td th:if="${lastYearVacation12 != null}">1.0</td>
+					<td th:if="${lastYearVacation12 == null}"></td>
+					<td th:if="${lastYearVacation13 != null}">1.0</td>
+					<td th:if="${lastYearVacation13 == null}"></td>
+					<td th:if="${lastYearVacation14 != null}">1.0</td>
+					<td th:if="${lastYearVacation14 == null}"></td>
+					<td th:if="${lastYearVacation15 != null}">1.0</td>
+					<td th:if="${lastYearVacation15 == null}"></td>
+					<td th:if="${lastYearVacation16 != null}">1.0</td>
+					<td th:if="${lastYearVacation16 == null}"></td>
+					<td th:if="${lastYearVacation17 != null}">1.0</td>
+					<td th:if="${lastYearVacation17 == null}"></td>
+					<td th:if="${lastYearVacation18 != null}">1.0</td>
+					<td th:if="${lastYearVacation18 == null}"></td>
+					<td th:if="${lastYearVacation19 != null}">1.0</td>
+					<td th:if="${lastYearVacation19 == null}"></td>
+					<td th:if="${lastYearVacation20 != null}">1.0</td>
+					<td th:if="${lastYearVacation20 == null}"></td>
+				</tr>
+				<tr>
+					<td th:text="${lastYearVacation21}"></td>
+					<td th:text="${lastYearVacation22}"></td>
+					<td th:text="${lastYearVacation23}"></td>
+					<td th:text="${lastYearVacation24}"></td>
+					<td th:text="${lastYearVacation25}"></td>
+					<td th:text="${lastYearVacation26}"></td>
+					<td th:text="${lastYearVacation27}"></td>
+					<td th:text="${lastYearVacation28}"></td>
+					<td th:text="${lastYearVacation29}"></td>
+					<td th:text="${lastYearVacation30}"></td>
+				</tr>
+				<tr>
+					<td th:if="${lastYearVacation21 != null}">1.0</td>
+					<td th:if="${lastYearVacation21 == null}"></td>
+					<td th:if="${lastYearVacation22 != null}">1.0</td>
+					<td th:if="${lastYearVacation22 == null}"></td>
+					<td th:if="${lastYearVacation23 != null}">1.0</td>
+					<td th:if="${lastYearVacation23 == null}"></td>
+					<td th:if="${lastYearVacation24 != null}">1.0</td>
+					<td th:if="${lastYearVacation24 == null}"></td>
+					<td th:if="${lastYearVacation25 != null}">1.0</td>
+					<td th:if="${lastYearVacation25 == null}"></td>
+					<td th:if="${lastYearVacation26 != null}">1.0</td>
+					<td th:if="${lastYearVacation26 == null}"></td>
+					<td th:if="${lastYearVacation27 != null}">1.0</td>
+					<td th:if="${lastYearVacation27 == null}"></td>
+					<td th:if="${lastYearVacation28 != null}">1.0</td>
+					<td th:if="${lastYearVacation28 == null}"></td>
+					<td th:if="${lastYearVacation29 != null}">1.0</td>
+					<td th:if="${lastYearVacation29 == null}"></td>
+					<td th:if="${lastYearVacation30 != null}">1.0</td>
+					<td th:if="${lastYearVacation30 == null}"></td>
+				</tr>
+				<tr>
+					<td th:text="${lastYearVacation31}"></td>
+					<td th:text="${lastYearVacation32}"></td>
+					<td th:text="${lastYearVacation33}"></td>
+					<td th:text="${lastYearVacation34}"></td>
+					<td th:text="${lastYearVacation35}"></td>
+					<td th:text="${lastYearVacation36}"></td>
+					<td th:text="${lastYearVacation37}"></td>
+					<td th:text="${lastYearVacation38}"></td>
+					<td th:text="${lastYearVacation39}"></td>
+					<td th:text="${lastYearVacation40}"></td>
+				</tr>
+				<tr>
+					<td th:if="${lastYearVacation31 != null}">1.0</td>
+					<td th:if="${lastYearVacation31 == null}"></td>
+					<td th:if="${lastYearVacation32 != null}">1.0</td>
+					<td th:if="${lastYearVacation32 == null}"></td>
+					<td th:if="${lastYearVacation33 != null}">1.0</td>
+					<td th:if="${lastYearVacation33 == null}"></td>
+					<td th:if="${lastYearVacation34 != null}">1.0</td>
+					<td th:if="${lastYearVacation34 == null}"></td>
+					<td th:if="${lastYearVacation35 != null}">1.0</td>
+					<td th:if="${lastYearVacation35 == null}"></td>
+					<td th:if="${lastYearVacation36 != null}">1.0</td>
+					<td th:if="${lastYearVacation36 == null}"></td>
+					<td th:if="${lastYearVacation37 != null}">1.0</td>
+					<td th:if="${lastYearVacation37 == null}"></td>
+					<td th:if="${lastYearVacation38 != null}">1.0</td>
+					<td th:if="${lastYearVacation38 == null}"></td>
+					<td th:if="${lastYearVacation39 != null}">1.0</td>
+					<td th:if="${lastYearVacation39 == null}"></td>
+					<td th:if="${lastYearVacation40 != null}">1.0</td>
+					<td th:if="${lastYearVacation40 == null}"></td>
+				</tr>
+
+				<tr>
+					<td colspan="2" style="background-color: #99CCFF">年度</td>
+					<td colspan="3" name="twoYearsAgo" th:text="${nowYear}"></td>
+					<td colspan="2" style="background-color: #99CCFF">取得日数</td>
+					<td colspan="3" name="countTwoYearsAgo" th:text="${countYear}"></td>
+				</tr>
+				<tr>
+					<td th:text="${yearVacation1}"></td>
+					<td th:text="${yearVacation2}"></td>
+					<td th:text="${yearVacation3}"></td>
+					<td th:text="${yearVacation4}"></td>
+					<td th:text="${yearVacation5}"></td>
+					<td th:text="${yearVacation6}"></td>
+					<td th:text="${yearVacation7}"></td>
+					<td th:text="${yearVacation8}"></td>
+					<td th:text="${yearVacation9}"></td>
+					<td th:text="${yearVacation10}"></td>
+				</tr>
+				<tr>
+					<td th:if="${yearVacation1 != null}">1.0</td>
+					<td th:if="${yearVacation1 == null}"></td>
+					<td th:if="${yearVacation2 != null}">1.0</td>
+					<td th:if="${yearVacation2 == null}"></td>
+					<td th:if="${yearVacation3 != null}">1.0</td>
+					<td th:if="${yearVacation3 == null}"></td>
+					<td th:if="${yearVacation4 != null}">1.0</td>
+					<td th:if="${yearVacation4 == null}"></td>
+					<td th:if="${yearVacation5 != null}">1.0</td>
+					<td th:if="${yearVacation5 == null}"></td>
+					<td th:if="${yearVacation6 != null}">1.0</td>
+					<td th:if="${yearVacation6 == null}"></td>
+					<td th:if="${yearVacation7 != null}">1.0</td>
+					<td th:if="${yearVacation7 == null}"></td>
+					<td th:if="${yearVacation8 != null}">1.0</td>
+					<td th:if="${yearVacation8 == null}"></td>
+					<td th:if="${yearVacation9 != null}">1.0</td>
+					<td th:if="${yearVacation9 == null}"></td>
+					<td th:if="${yearVacation10 != null}">1.0</td>
+					<td th:if="${yearVacation10 == null}"></td>
+				</tr>
+				<tr>
+					<td th:text="${yearVacation11}"></td>
+					<td th:text="${yearVacation12}"></td>
+					<td th:text="${yearVacation13}"></td>
+					<td th:text="${yearVacation14}"></td>
+					<td th:text="${yearVacation15}"></td>
+					<td th:text="${yearVacation16}"></td>
+					<td th:text="${yearVacation17}"></td>
+					<td th:text="${yearVacation18}"></td>
+					<td th:text="${yearVacation19}"></td>
+					<td th:text="${yearVacation20}"></td>
+				</tr>
+				<tr>
+					<td th:if="${yearVacation11 != null}">1.0</td>
+					<td th:if="${yearVacation11 == null}"></td>
+					<td th:if="${yearVacation12 != null}">1.0</td>
+					<td th:if="${yearVacation12 == null}"></td>
+					<td th:if="${yearVacation13 != null}">1.0</td>
+					<td th:if="${yearVacation13 == null}"></td>
+					<td th:if="${yearVacation14 != null}">1.0</td>
+					<td th:if="${yearVacation14 == null}"></td>
+					<td th:if="${yearVacation15 != null}">1.0</td>
+					<td th:if="${yearVacation15 == null}"></td>
+					<td th:if="${yearVacation16 != null}">1.0</td>
+					<td th:if="${yearVacation16 == null}"></td>
+					<td th:if="${yearVacation17 != null}">1.0</td>
+					<td th:if="${yearVacation17 == null}"></td>
+					<td th:if="${yearVacation18 != null}">1.0</td>
+					<td th:if="${yearVacation18 == null}"></td>
+					<td th:if="${yearVacation19 != null}">1.0</td>
+					<td th:if="${yearVacation19 == null}"></td>
+					<td th:if="${yearVacation20 != null}">1.0</td>
+					<td th:if="${yearVacation20 == null}"></td>
+				</tr>
+				<tr>
+					<td th:text="${yearVacation21}"></td>
+					<td th:text="${yearVacation22}"></td>
+					<td th:text="${yearVacation23}"></td>
+					<td th:text="${yearVacation24}"></td>
+					<td th:text="${yearVacation25}"></td>
+					<td th:text="${yearVacation26}"></td>
+					<td th:text="${yearVacation27}"></td>
+					<td th:text="${yearVacation28}"></td>
+					<td th:text="${yearVacation29}"></td>
+					<td th:text="${yearVacation30}"></td>
+				</tr>
+				<tr>
+					<td th:if="${yearVacation21 != null}">1.0</td>
+					<td th:if="${yearVacation21 == null}"></td>
+					<td th:if="${yearVacation22 != null}">1.0</td>
+					<td th:if="${yearVacation22 == null}"></td>
+					<td th:if="${yearVacation23 != null}">1.0</td>
+					<td th:if="${yearVacation23 == null}"></td>
+					<td th:if="${yearVacation24 != null}">1.0</td>
+					<td th:if="${yearVacation24 == null}"></td>
+					<td th:if="${yearVacation25 != null}">1.0</td>
+					<td th:if="${yearVacation25 == null}"></td>
+					<td th:if="${yearVacation26 != null}">1.0</td>
+					<td th:if="${yearVacation26 == null}"></td>
+					<td th:if="${yearVacation27 != null}">1.0</td>
+					<td th:if="${yearVacation27 == null}"></td>
+					<td th:if="${yearVacation28 != null}">1.0</td>
+					<td th:if="${yearVacation28 == null}"></td>
+					<td th:if="${yearVacation29 != null}">1.0</td>
+					<td th:if="${yearVacation29 == null}"></td>
+					<td th:if="${yearVacation30 != null}">1.0</td>
+					<td th:if="${yearVacation30 == null}"></td>
+				</tr>
+				<tr>
+					<td th:text="${yearVacation31}"></td>
+					<td th:text="${yearVacation32}"></td>
+					<td th:text="${yearVacation33}"></td>
+					<td th:text="${yearVacation34}"></td>
+					<td th:text="${yearVacation35}"></td>
+					<td th:text="${yearVacation36}"></td>
+					<td th:text="${yearVacation37}"></td>
+					<td th:text="${yearVacation38}"></td>
+					<td th:text="${yearVacation39}"></td>
+					<td th:text="${yearVacation40}"></td>
+				</tr>
+				<tr>
+					<td th:if="${yearVacation31 != null}">1.0</td>
+					<td th:if="${yearVacation31 == null}"></td>
+					<td th:if="${yearVacation32 != null}">1.0</td>
+					<td th:if="${yearVacation32 == null}"></td>
+					<td th:if="${yearVacation33 != null}">1.0</td>
+					<td th:if="${yearVacation33 == null}"></td>
+					<td th:if="${yearVacation34 != null}">1.0</td>
+					<td th:if="${yearVacation34 == null}"></td>
+					<td th:if="${yearVacation35 != null}">1.0</td>
+					<td th:if="${yearVacation35 == null}"></td>
+					<td th:if="${yearVacation36 != null}">1.0</td>
+					<td th:if="${yearVacation36 == null}"></td>
+					<td th:if="${yearVacation37 != null}">1.0</td>
+					<td th:if="${yearVacation37 == null}"></td>
+					<td th:if="${yearVacation38 != null}">1.0</td>
+					<td th:if="${yearVacation38 == null}"></td>
+					<td th:if="${yearVacation39 != null}">1.0</td>
+					<td th:if="${yearVacation39 == null}"></td>
+					<td th:if="${yearVacation40 != null}">1.0</td>
+					<td th:if="${yearVacation40 == null}"></td>
+				</tr>
+
+
+			</table>
+
+			<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+			<script src="../js/bootstrap.bundle.min.js"></script>
+			<script src="../js/index.js"></script>
+			<script src="../js/menu.js"></script>
+			<script src="../js/bootstrap/bootstrap.min.js"></script>
+			<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+			<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
+			<script src="https://cdn.jsdelivr.net/npm/flatpickr@latest/dist/plugins/monthSelect/index.js"></script>
+
+</body>
+
+</html>

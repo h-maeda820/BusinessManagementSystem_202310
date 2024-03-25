@@ -1,0 +1,224 @@
+INSERT INTO m_calendar
+(
+   `seq_id`,
+   `client_id`,
+   `employee_id`,
+   `year_month`,
+   `monthly_holidays`,
+   `monthly_prescribed_days`,
+   `comment`,
+   `delete_flg`,
+   `created_at`,
+   `created_user`,
+   `updated_at`,
+   `updated_user`
+)
+VALUES
+(
+   1,
+   101,
+   NULL,
+   '2023-11-01',
+   10,
+   5,
+   NULL,
+   0,
+   '2023-11-02 10:43:27',
+   'nexus001',
+   '2023-11-02 10:43:27',
+   'nexus001'
+);
+INSERT INTO m_calendar
+(
+   `seq_id`,
+   `client_id`,
+   `employee_id`,
+   `year_month`,
+   `monthly_holidays`,
+   `monthly_prescribed_days`,
+   `comment`,
+   `delete_flg`,
+   `created_at`,
+   `created_user`,
+   `updated_at`,
+   `updated_user`
+)
+VALUES
+(
+   2,
+   102,
+   NULL,
+   '2023-12-01',
+   10,
+   5,
+   NULL,
+   0,
+   '2023-11-02 10:43:27',
+   'nexus001',
+   '2023-11-02 10:43:27',
+   'nexus001'
+);
+INSERT INTO m_client
+(
+   client_id,
+   client_name,
+   open_time,
+   close_time,
+   working_time,
+   rest1_start,
+   rest1_end,
+   rest2_start,
+   rest2_end,
+   rest3_start,
+   rest3_end,
+   rest4_start,
+   rest4_end,
+   rest5_start,
+   rest5_end,
+   rest6_start,
+   rest6_end,
+   adjust_rest_time_start,
+   adjust_rest_time_end,
+   comment,
+   delete_flg,
+   created_at,
+   created_user,
+   updated_at,
+   updated_user
+)
+VALUES
+(
+   101,
+   '株式会社アクサス',
+   '09:00:00',
+   '18:00:00',
+   8.00,
+   '12:00:00',
+   '13:00:00',
+   NULL,
+   NULL,
+   NULL,
+   NULL,
+   NULL,
+   NULL,
+   NULL,
+   NULL,
+   NULL,
+   NULL,
+   NULL,
+   NULL,
+   'コメント１',
+   0,
+   '2023-01-01T00:00:00.000',
+   'nexus001',
+   '2023-01-01T00:00:00.000',
+   'nexus001'
+);
+INSERT INTO m_client
+(
+   client_id,
+   client_name,
+   open_time,
+   close_time,
+   working_time,
+   rest1_start,
+   rest1_end,
+   rest2_start,
+   rest2_end,
+   rest3_start,
+   rest3_end,
+   rest4_start,
+   rest4_end,
+   rest5_start,
+   rest5_end,
+   rest6_start,
+   rest6_end,
+   adjust_rest_time_start,
+   adjust_rest_time_end,
+   comment,
+   delete_flg,
+   created_at,
+   created_user,
+   updated_at,
+   updated_user
+)
+VALUES
+(
+   102,
+   '株式会社イクサス',
+   '09:00:00',
+   '18:00:00',
+   8.00,
+   '12:00:00',
+   '13:00:00',
+   NULL,
+   NULL,
+   NULL,
+   NULL,
+   NULL,
+   NULL,
+   NULL,
+   NULL,
+   NULL,
+   NULL,
+   NULL,
+   NULL,
+   'コメント２',
+   0,
+   '2023-01-01T00:00:00.000',
+   'nexus001',
+   '2023-01-01T00:00:00.000',
+   'nexus001'
+);
+INSERT INTO m_employee
+(
+   employee_id,
+   employee_name,
+   client_id,
+   hourly_wage,
+   paid_holiday_std,
+   delete_flg,
+   created_at,
+   created_user,
+   updated_at,
+   updated_user
+)
+VALUES
+(
+   1,
+   '田中零郎1',
+   101,
+   1,
+   '2023-07-01',
+   0,
+   '2023-01-01T00:00:00.000',
+   'nexus001',
+   '2023-08-01T00:00:00.000',
+   'nexus001'
+);
+INSERT INTO m_employee
+(
+   employee_id,
+   employee_name,
+   client_id,
+   hourly_wage,
+   paid_holiday_std,
+   delete_flg,
+   created_at,
+   created_user,
+   updated_at,
+   updated_user
+)
+VALUES
+(
+   2,
+   '田中零郎2',
+   102,
+   1,
+   '2023-07-01',
+   0,
+   '2023-01-01T00:00:00.000',
+   'nexus001',
+   '2023-08-01T00:00:00.000',
+   'nexus001'
+);
