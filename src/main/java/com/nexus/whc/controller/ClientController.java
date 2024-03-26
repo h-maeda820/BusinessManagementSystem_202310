@@ -210,7 +210,6 @@ public class ClientController {
 		redirectAttributes.addFlashAttribute("client_id", clientId);
 		redirectAttributes.addFlashAttribute("client_name", clientName);
 
-
 		return "redirect:/client/list?pageNumber=" + pageNumber;
 	}
 
@@ -591,8 +590,9 @@ public class ClientController {
 
 		/*排他チェック（編集中ロック解除）*/
 		exclusiveCheck.ExclusiveLockDalete(clientId, loginUserId, tableNumber);
-		// 論理削除を実行
-		clientService.deleteClient(clientId);
+
+		int result = clientService.deleteClient(clientId);
+		attr.addFlashAttribute("result", result + "件削除しました。");
 
 		return res;
 	}

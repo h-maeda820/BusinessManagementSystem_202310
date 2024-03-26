@@ -116,12 +116,12 @@ public class UserController {
 		model.addAttribute("permission", authStatus);
 		model.addAttribute("mail_address", mailAddress);
 		model.addAttribute("list", searchActiveUserList);
-		
+
 		session.setAttribute("user_id", userId);
 		session.setAttribute("user_name", userName);
 		session.setAttribute("permission", authStatus);
 		session.setAttribute("mail_address", mailAddress);
-		
+
 		//ページネーション用
 		//アクティブなデータの総数
 		int totalClient = userServices.searchCount();
@@ -223,10 +223,9 @@ public class UserController {
 		redirectAttributes.addFlashAttribute("permission", authStatus);
 		redirectAttributes.addFlashAttribute("mail_address", mailAddress);
 
-
 		return REDIRECT_LIST_PAGE + "?pageNumber=" + pageNumber;
 	}
-	
+
 	//	/**
 	//	 * サービスから一覧の情報を受け取り画面に表示させるメソッド
 	//	 * @param model　スコープに保存する為の引数
@@ -417,7 +416,8 @@ public class UserController {
 			}
 
 			/*選択したユーザー情報削除*/
-			userServices.daleteUser(seqId);
+			int result = userServices.daleteUser(seqId);
+			attr.addFlashAttribute("result", result + "件削除しました。");
 
 			/*排他チェック（編集中後）*/
 			exclusiveCheck.ExclusiveLockDalete(seqId, LOGIN_USER_ID, TABLE_NUMBER);
@@ -454,7 +454,8 @@ public class UserController {
 				}
 
 				/*選択したユーザー情報削除*/
-				userServices.daleteUser(seq_id);
+				int result = userServices.daleteUser(seq_id);
+				attr.addFlashAttribute("result", result + "件削除しました。");
 
 				/*排他チェック（編集中後）*/
 				exclusiveCheck.ExclusiveLockDalete(seq_id, LOGIN_USER_ID, TABLE_NUMBER);

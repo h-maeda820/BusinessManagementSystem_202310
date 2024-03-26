@@ -15,15 +15,8 @@
 	<script src="../js/index.js"></script>
 	<script src="../js/SMSEM001.js"></script>
 	<style>
-		/* ステータスに応じた行の背景色 */
-		/* 初期状態のスタイル */
-		.initial-status {
-			background-color: white;
-			/* 初期状態の背景色を白に設定 */
-		}
-
-				/* ダイアログ用CSS */
-				.modalArea {
+		/* ダイアログ用CSS */
+		.modalArea {
 			position: fixed;
 			z-index: 10;
 
@@ -49,7 +42,7 @@
 		.modalBg {
 			width: 100%;
 			height: 100%;
-			background-color: rgba(30, 30, 30, 0.9);
+			background-color: rgba(40, 30, 30, 0.9);
 		}
 
 		.modalWrapper {
@@ -79,6 +72,51 @@
 			margin-top: 5px;
 		}
 	</style>
+	<style>
+		/* ステータスに応じた行の背景色 */
+		/* 初期状態のスタイル */
+		.initial-status {
+			background-color: white;
+			/* 初期状態の背景色を白に設定 */
+		}
+
+		.statusModalArea {
+			position: fixed;
+			z-index: 10;
+
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+		}
+
+		.statusModalWrapper {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			width: 70%;
+			height: auto;
+			max-width: 550px;
+			max-height: 300px;
+			padding: 10px 30px;
+			background-color: #fff;
+		}
+
+		.statusModal {
+			display: none;
+		}
+
+		.centered-text {
+			text-align: center;
+			/* テキストの中央揃え */
+		}
+
+		.top-margin15 {
+			margin-top: 15px;
+		}
+	</style>
+
 	<title>WHC:社員マスター一覧</title>
 </head>
 
@@ -155,6 +193,57 @@
 				</section>
 				<!-- 顧客選択ダイアログここまで -->
 
+				<!--「i」ダイアログ -->
+				<section id="statusModal" class="statusModalArea statusModal">
+					<div id="modalBg" class="modalBg"></div>
+					<div class="statusModalWrapper">
+						<div class="modalContents">
+
+							<div class="top-margin15">
+								<table class="table table-sm table-striped table-bordered mt-0">
+									<thead>
+										<tr bgcolor="royalblue" style="color: white">
+											<th scope="col" class="centered-text" style="width: 45px; height: 40px">ステータス
+											</th>
+											<th scope="col" class="centered-text" style="width: 20px">行の色</th>
+											<th scope="col" class="centered-text" style="width: 20px">アイコン</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td class="centered-text" style="height: 35px;">有休残日数なし</td>
+											<td class="centered-text" style="height: 35px;">黄色</td>
+											<td class="centered-text" style="height: 35px;"> - </td>
+										</tr>
+										<tr>
+											<td class="centered-text" style="height: 35px;">有休残日数不足(通知)</td>
+											<td class="centered-text" style="height: 35px;">ピンク</td>
+											<td class="centered-text" style="height: 35px;"> - </td>
+										</tr>
+										<tr>
+											<td class="centered-text" style="height: 35px;">有休残日数不足(注意)</td>
+											<td class="centered-text" style="height: 35px;">ピンク</td>
+											<td class="centered-text"
+												style="height: 35px; font-weight: normal; color: orange;"> ▲ </td>
+										</tr>
+										<tr>
+											<td class="centered-text" style="height: 35px">有休残日数不足(警告)</td>
+											<td class="centered-text" style="height: 35px">ピンク</td>
+											<td class="centered-text"
+												style="height: 35px; font-weight: normal; color: red;"> ▲ </td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+
+						</div>
+						<div id="closeModal" class="closeModal">
+							×
+						</div>
+					</div>
+				</section>
+				<!-- 「i」ダイアログここまで -->
+
 				<!--エラーメッセージ-->
 				<div class="text-danger" th:text="${result}"></div>
 				<div class="text-danger" th:text="${searchError}"></div>
@@ -167,7 +256,7 @@
 						<div class="input-group mb-2 mx-2" style="width: 600px">
 							<span class="input-group-text">社員番号</span>
 							<input type="text" name="employeeId" th:value="*{employeeId != null ? employeeId : ''}"
-								 aria-label="emNo" class="form-control" style="width: 150px">
+								aria-label="emNo" class="form-control" style="width: 150px">
 							<span class="input-group-text">社員氏名</span> <input type="text" name="employeeName"
 								th:value="*{employeeName != null ? employeeName : ''}" class="form-control"
 								style="width: 150px;">
@@ -193,24 +282,24 @@
 					<!--検索条件記入欄3行目(実装はなし)-->
 					<div class="card-body ps-2 pt-0" style="display: flex">
 						<span class="input-group-text mb-3 mx-2">ステータス</span>
-						<button type="button" id="toggleButton"
+						<button type="button" id="openStatusModal"
 							style="border-radius: 40%; width: 20px; height: 20px; font-size: 10px;">i</button>
 
 						<span class="input-group-text mb-3 mx-1">有給残日数なし</span>
-						<input class="form-check-input mt-2 mx-3" type="checkbox" th:checked="${noPaidHoliday}"
+						<input class="form-check-input mt-2 mx-3" type="checkbox" th:checked="*{noPaidHoliday}"
 							aria-label="Checkbox for following text input" name="noPaidHoliday">
 
 						<span class="input-group-text mb-3 mx-1">有給取得日数不足(通知)</span>
 						<input class="form-check-input mt-2 mx-3" type="checkbox"
-							th:checked="${notificationPaidHoliday}" aria-label="Checkbox for following text input"
+							th:checked="*{notificationPaidHoliday}" aria-label="Checkbox for following text input"
 							name="notificationPaidHoliday">
 
 						<span class="input-group-text mb-3 mx-1">有給取得日数不足(注意)</span>
-						<input class="form-check-input mt-2 mx-3" type="checkbox" th:checked="${attentionPaidHoliday}"
+						<input class="form-check-input mt-2 mx-3" type="checkbox" th:checked="*{attentionPaidHoliday}"
 							aria-label="Checkbox for following text input" name="attentionPaidHoliday">
 
 						<span class="input-group-text mb-3 mx-1">有給取得日数不足(警告)</span>
-						<input class="form-check-input mt-2 mx-3" type="checkbox" th:checked="${warningPaidHoliday}"
+						<input class="form-check-input mt-2 mx-3" type="checkbox" th:checked="*{warningPaidHoliday}"
 							aria-label="Checkbox for following text input" name="warningPaidHoliday">
 
 					</div>
@@ -238,80 +327,83 @@
 							style="color: white; background-color: cornflowerblue;">選択行帳票出力</button>
 					</div>
 				</div>
-			</form>
 
-			<!-- 一覧 -->
-			<div class="text-nowrap table-responsive" id="listLimit">
-				<table class="table table-sm table-striped table-bordered my-3 center" style="width: 600px">
-					<thead>
-						<tr bgcolor="royalblue" class="text-center" style="color: white">
-							<th scope="col" style="width: 40px">i</th>
-							<th scope="col" style="width: 20px"><input type="checkbox"></th>
-							<th scope="col" style="width: 45px">社員番号</th>
-							<th scope="col" style="width: 100px">社員氏名</th>
-							<th scope="col" style="width: 100px">担当顧客番号</th>
-							<th scope="col" style="width: 100px">担当顧客名</th>
-							<th scope="col" style="width: 45px">時給</th>
-							<th scope="col" style="width: 170px">ステータス</th>
-							<th scope="col" style="width: 100px">有給基準日</th>
-							<th scope="col" style="width: 100px">有給残日数(当年度分)</th>
-							<th scope="col" style="width: 100px">有給残日数(前年度分)</th>
-							<th scope="col" style="width: 100px">有給取得日数</th>
-							<th scope="col" style="width: 60px">有給詳細</th>
-						</tr>
-					</thead>
 
-					<!--一覧表示Or検索結果をJavaでDBから取得して表示-->
-					<tbody style="font-weight: normal;">
-						<!--Thymeleafを使用してリストの各アイテムに対して行を生成-->
-						<tr th:each="item : ${list}" class="employee-row" style="cursor: pointer;">
+				<!-- 一覧 -->
+				<div class="text-nowrap table-responsive" id="listLimit">
+					<table class="table table-sm table-striped table-bordered my-3 center" style="width: 600px">
+						<thead>
+							<tr bgcolor="royalblue" class="text-center" style="color: white">
+								<th scope="col" style="width: 40px">i</th>
+								<th scope="col" style="width: 20px"><input type="checkbox"></th>
+								<th scope="col" style="width: 45px">社員番号</th>
+								<th scope="col" style="width: 100px">社員氏名</th>
+								<th scope="col" style="width: 100px">担当顧客番号</th>
+								<th scope="col" style="width: 100px">担当顧客名</th>
+								<th scope="col" style="width: 45px">時給</th>
+								<th scope="col" style="width: 170px">ステータス</th>
+								<th scope="col" style="width: 100px">有給基準日</th>
+								<th scope="col" style="width: 100px">有給残日数(当年度分)</th>
+								<th scope="col" style="width: 100px">有給残日数(前年度分)</th>
+								<th scope="col" style="width: 100px">有給取得日数</th>
+								<th scope="col" style="width: 60px">有給詳細</th>
+							</tr>
+						</thead>
 
-							<th th:if="${item.application_class == '有給取得日数不足(注意)'}" scope="col"
-								style="width: 40px; font-weight: normal; color: orange;">▲</th>
-							<th th:if="${item.application_class == '有給取得日数不足(警告)'}" scope="col"
-								style="width: 40px; font-weight: normal; color: red;">▲</th>
-							<th th:if="${item.application_class == '有給取得日数不足(通知)'}" scope="col"
-								style="width: 40px; font-weight: normal;"> </th>
-							<th th:if="${item.application_class == '有給残日数なし'}" scope="col"
-								style="width: 40px; font-weight: normal;"> </th>
-							<th th:if="${item.application_class == ''}" scope="col"
-								style="width: 40px; font-weight: normal;"> </th>
+						<!--一覧表示Or検索結果をJavaでDBから取得して表示-->
+						<tbody style="font-weight: normal;">
+							<!--Thymeleafを使用してリストの各アイテムに対して行を生成-->
+							<tr th:each="item : ${list}" class="employee-row" style="cursor: pointer;"
+							th:style="${item != null ? item.application_class == '' ? 'background-color: white;' :  item.application_class == '有給残日数なし' ? 'background-color: lightyellow;' : 'background-color: pink' : 'background-color: white;'}">
 
-							<th scope="col" style="width: 20px"><input type="checkbox" th:value="${item.employee_id}"
-									id="employee_id" name="selectCheck" form="selectCheck"></th>
-							<th scope="col" th:text="${item.employee_id}"
-								style="width: 45px; text-align: center; font-weight: normal;"></th>
-							<!--社員名がクリックされたら指定のIdのeditへ遷移(新規登録画面の更新モード)-->
-							<th scope="col" style="text-align: center; font-weight: normal;"><a
-									th:href="@{/employee/edit?employeeId={employee_id}(employee_id=${item.employee_id})}"
-									th:text="${item.employee_name}"></a></th>
-							<th scope="col" th:text="${item.client_id}"
-								style="width: 100px; text-align: center; font-weight: normal;"></th>
-							<th scope="col" th:text="${item.client_name}"
-								style="width: 100px; text-align: center; font-weight: normal;">
-							</th>
-							<!--trueなら○、×ならfalseで表示-->
-							<th scope="col" th:text="${item.hourly_wage ? '○' : '×'}"
-								style="width: 45px; text-align: center; font-weight: normal;"></th>
-							<th scope="col" id=status th:text="${item.application_class}"
-								style="width: 170px; font-weight: normal;"></th>
-							<th scope="col" th:text="${item.paid_holiday_std}"
-								style="width: 100px; font-weight: normal;"></th>
-							<th scope="col" id="this_year" th:text="${item.remaind_this_year}"
-								style="width: 100px; font-weight: normal;"></th>
-							<th scope="col" id="last_year" th:text="${item.remaind_last_year}"
-								style="width: 100px; font-weight: normal;"></th>
-							<th scope="col" id="count" th:text="${item.holiday_count}"
-								style="width: 100px; font-weight: normal;"></th>
-							<th scope="col"><a href="paidDetails" style="width: 60px; font-weight: normal;">開く</a></th>
-						</tr>
-					</tbody>
-				</table>
-			</div>
+								<th th:if="${item.application_class == '有給取得日数不足(注意)'}" scope="col"
+									style="width: 40px; font-weight: normal; color: orange;">▲</th>
+								<th th:if="${item.application_class == '有給取得日数不足(警告)'}" scope="col"
+									style="width: 40px; font-weight: normal; color: red;">▲</th>
+								<th th:if="${item.application_class == '有給取得日数不足(通知)'}" scope="col"
+									style="width: 40px; font-weight: normal;"> </th>
+								<th th:if="${item.application_class == '有給残日数なし'}" scope="col"
+									style="width: 40px; font-weight: normal;"> </th>
+								<th th:if="${item.application_class == ''}" scope="col"
+									style="width: 40px; font-weight: normal;"> </th>
 
-			<!--ページネーションの表示-->
-			<!--employee/listだったら下記を表示-->
-			<!-- <div th:if="${listPage}" style="display: flex; justify-content: center;">
+								<th scope="col" style="width: 20px"><input type="checkbox"
+										th:value="${item.employee_id}" id="employee_id" name="selectCheck"
+										form="selectCheck"></th>
+								<th scope="col" th:text="${item.employee_id}"
+									style="width: 45px; text-align: center; font-weight: normal;"></th>
+								<!--社員名がクリックされたら指定のIdのeditへ遷移(新規登録画面の更新モード)-->
+								<th scope="col" style="text-align: center; font-weight: normal;"><a
+										th:href="@{/employee/edit?employeeId={employee_id}(employee_id=${item.employee_id})}"
+										th:text="${item.employee_name}"></a></th>
+								<th scope="col" th:text="${item.client_id}"
+									style="width: 100px; text-align: center; font-weight: normal;"></th>
+								<th scope="col" th:text="${item.client_name}"
+									style="width: 100px; text-align: center; font-weight: normal;">
+								</th>
+								<!--trueなら○、×ならfalseで表示-->
+								<th scope="col" th:text="${item.hourly_wage ? '○' : '×'}"
+									style="width: 45px; text-align: center; font-weight: normal;"></th>
+								<th scope="col" id=status th:text="${item.application_class}"
+									style="width: 170px; font-weight: normal;"></th>
+								<th scope="col" th:text="${item.paid_holiday_std}"
+									style="width: 100px; font-weight: normal;"></th>
+								<th scope="col" id="this_year" th:text="${item.remaind_this_year}"
+									style="width: 100px; font-weight: normal;"></th>
+								<th scope="col" id="last_year" th:text="${item.remaind_last_year}"
+									style="width: 100px; font-weight: normal;"></th>
+								<th scope="col" id="count" th:text="${item.holiday_count}"
+									style="width: 100px; font-weight: normal;"></th>
+								<th scope="col"><a href="paidDetails" style="width: 60px; font-weight: normal;">開く</a>
+								</th>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+
+				<!--ページネーションの表示-->
+				<!--employee/listだったら下記を表示-->
+				<!-- <div th:if="${listPage}" style="display: flex; justify-content: center;">
 				<ul class="pagination">
 					<li th:if="${currentPage > 2}">
 						<a th:href="@{/employee/list(page=1)}" style="margin: 0 5px;">最初へ</a>
@@ -332,66 +424,67 @@
 				</ul>
 			</div> -->
 
-			<th:block th:if="${pageDisplay == true}">
-				<div class="container">
-					<div class="row">
-						<div class="col-5 text-end">
-							<th:block th:if="${pageNumber > 1}">
-								<a class="mx-3" th:href="@{/employee/pageList(pageNumber=${previous_page})}">←　前のページ</a>
-							</th:block>
-						</div>
-						<div class="col-2 text-center">
-							<th:block th:if="${session.pageList2 == null}">
-								<span th:each="page,stat :${session.pageList}">
-									<th:block th:if="${stat.count < 4}">
-										<a class="mx-1" name="pageNumber" th:text="${page}"
-											th:href="@{/employee/pageList(pageNumber=${page})}"></a>
-									</th:block>
-									<th:block th:if="${stat.count == 4 && session.pageList.size() > 4}">
-										<span><a href="#" onclick="return false;">...</a></span>
-									</th:block>
-									<th:block th:if="${stat.count == stat.size && stat.size > 3}">
-										<a class="mx-1" name="pageNumber" th:text="${page}"
-											th:href="@{/employee/pageList(pageNumber=${page})}"></a>
-									</th:block>
-								</span>
-							</th:block>
-							<th:block th:if="${session.pageList2 != null}">
-								<span th:each="page,stat :${session.pageList2}">
-									<th:block th:if="${pageNumber > 1 && stat.count == 1}">
-										<a class="mx-1" name="pageNumber" th:text="1"
-											th:href="@{/employee/pageList(pageNumber=${1})}"></a>
-									</th:block>
-									<th:block
-										th:if="${stat.count == 1 &&  pageNumber > 3 && session.pageList.size() > 4}">
-										<span><a href="#" onclick="return false;">...</a></span>
-									</th:block>
-									<th:block th:if="${stat.count < 4}">
-										<a class="mx-1" name="pageNumber" th:text="${page}"
-											th:href="@{/employee/pageList(pageNumber=${page})}"></a>
-									</th:block>
-									<th:block
-										th:if="${stat.count == 4 &&  pageNumber < session.pageList.size() -2 && session.pageList.size() > 4}">
-										<span><a href="#" onclick="return false;">...</a></span>
-									</th:block>
-									<th:block th:if="${stat.count == stat.size && stat.size > 3}">
-										<a class="mx-1" name="pageNumber" th:text="${page}"
-											th:href="@{/employee/pageList(pageNumber=${page})}"></a>
-									</th:block>
-								</span>
-							</th:block>
-						</div>
-						<div class="col-5 text-start">
-							<th:block th:if="${next_page != pageNumber && session.pageList.size() != 0}">
-								<a class="mx-3" th:href="@{/employee/pageList(pageNumber=${next_page})}">次のページ　→</a>
-							</th:block>
+				<th:block th:if="${pageDisplay == true}">
+					<div class="container">
+						<div class="row">
+							<div class="col-5 text-end">
+								<th:block th:if="${pageNumber > 1}">
+									<a class="mx-3"
+										th:href="@{/employee/pageList(pageNumber=${previous_page})}">←　前のページ</a>
+								</th:block>
+							</div>
+							<div class="col-2 text-center">
+								<th:block th:if="${session.pageList2 == null}">
+									<span th:each="page,stat :${session.pageList}">
+										<th:block th:if="${stat.count < 4}">
+											<a class="mx-1" name="pageNumber" th:text="${page}"
+												th:href="@{/employee/pageList(pageNumber=${page})}"></a>
+										</th:block>
+										<th:block th:if="${stat.count == 4 && session.pageList.size() > 4}">
+											<span><a href="#" onclick="return false;">...</a></span>
+										</th:block>
+										<th:block th:if="${stat.count == stat.size && stat.size > 3}">
+											<a class="mx-1" name="pageNumber" th:text="${page}"
+												th:href="@{/employee/pageList(pageNumber=${page})}"></a>
+										</th:block>
+									</span>
+								</th:block>
+								<th:block th:if="${session.pageList2 != null}">
+									<span th:each="page,stat :${session.pageList2}">
+										<th:block th:if="${pageNumber > 1 && stat.count == 1}">
+											<a class="mx-1" name="pageNumber" th:text="1"
+												th:href="@{/employee/pageList(pageNumber=${1})}"></a>
+										</th:block>
+										<th:block
+											th:if="${stat.count == 1 &&  pageNumber > 3 && session.pageList.size() > 4}">
+											<span><a href="#" onclick="return false;">...</a></span>
+										</th:block>
+										<th:block th:if="${stat.count < 4}">
+											<a class="mx-1" name="pageNumber" th:text="${page}"
+												th:href="@{/employee/pageList(pageNumber=${page})}"></a>
+										</th:block>
+										<th:block
+											th:if="${stat.count == 4 &&  pageNumber < session.pageList.size() -2 && session.pageList.size() > 4}">
+											<span><a href="#" onclick="return false;">...</a></span>
+										</th:block>
+										<th:block th:if="${stat.count == stat.size && stat.size > 3}">
+											<a class="mx-1" name="pageNumber" th:text="${page}"
+												th:href="@{/employee/pageList(pageNumber=${page})}"></a>
+										</th:block>
+									</span>
+								</th:block>
+							</div>
+							<div class="col-5 text-start">
+								<th:block th:if="${next_page != pageNumber && session.pageList.size() != 0}">
+									<a class="mx-3" th:href="@{/employee/pageList(pageNumber=${next_page})}">次のページ　→</a>
+								</th:block>
+							</div>
 						</div>
 					</div>
-				</div>
-				<input type="hidden" name="pageNumber" th:value="${pageNumber}">
-			</th:block>
+					<input type="hidden" name="pageNumber" th:value="${pageNumber}">
+				</th:block>
 
-
+			</form>
 
 		</main>
 	</div>
@@ -464,9 +557,21 @@
 			}
 		});
 
-
-
 	</script>
+	<script>
+		//ステータスダイアログを開く
+		$(function () {
+			$('#openStatusModal').click(function () {
+				$('body').css('overflow', 'hidden'); //スクロール無効化
+				$('#statusModal').fadeIn();
+			});
+			$('#closeModal , #modalBg').click(function () {
+				$('body').css('overflow', 'auto'); //スクロール有効化
+				$('#statusModal').fadeOut();
+			});
+		});
+	</script>
+
 
 	<!-- モーダルウィンドウ用js -->
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>

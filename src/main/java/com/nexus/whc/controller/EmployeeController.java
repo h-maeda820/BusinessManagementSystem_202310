@@ -825,8 +825,10 @@ public class EmployeeController {
 			exclusiveCheck.ExclusiveLockDalete(dEmpId, loginUserId, tableNumber);
 
 			/*排他チェックに問題がなければ社員マスタと有給休暇マスタの削除SQLを実行*/
-			employeeService.deleteEmployee(empId, updatedUser);
+			int result = employeeService.deleteEmployee(empId, updatedUser);
 			employeeService.deletePaidVacation(empId, updatedUser);
+
+			attr.addFlashAttribute("result", result + "件削除しました。");
 
 		}
 

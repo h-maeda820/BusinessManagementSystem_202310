@@ -83,9 +83,9 @@ public class SelectDialogController {
 
 		return "redirect:/employee/regist";
 	}
-	
+
 	/**
-	 * 社員マスタの新規登録画面の選択ダイアログで検索ボタンが押されたら実行される
+	 * 社員マスタの編集画面の選択ダイアログで検索ボタンが押されたら実行される
 	 * @param selectDialogForm
 	 * @param employeeDate
 	 * @param redirectAttributes
@@ -95,7 +95,7 @@ public class SelectDialogController {
 	public String employeeEditSearchDialog(
 			@ModelAttribute("selectDialogForm") SelectDialogForm selectDialogForm,
 			@ModelAttribute("employeeDate") EmployeeDate employeeDate,
-			@RequestParam("employeeId") String employeeId, 
+			@RequestParam("employeeId") String employeeId,
 			RedirectAttributes redirectAttributes) {
 
 		redirectAttributes.addFlashAttribute("selectDialogForm", selectDialogForm);

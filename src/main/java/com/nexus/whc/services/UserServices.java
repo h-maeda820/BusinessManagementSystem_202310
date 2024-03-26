@@ -8,6 +8,7 @@
  *
  */
 package com.nexus.whc.services;
+
 import java.util.List;
 import java.util.Map;
 
@@ -80,9 +81,10 @@ public class UserServices {
 	 * ユーザー情報削除機能
 	 * @param selectCheck　選択したユーザーのシーケンスIDを持つ変数
 	 */
-	public void daleteUser(String seqId) {
+	public int daleteUser(String seqId) {
 
-		userRepository.daleteUser(seqId);
+		int result = userRepository.daleteUser(seqId);
+		return result;
 	}
 
 	/**
@@ -101,9 +103,9 @@ public class UserServices {
 		}
 
 		/*ランダムでPWを生成*/
-//		Random random = new Random();
-//		int randomPass = random.nextInt(10000);
-		
+		//		Random random = new Random();
+		//		int randomPass = random.nextInt(10000);
+
 		String password = RandomStringUtils.randomAlphanumeric(12);
 
 		userRepository.createUser(userId, userName, password, auth_id, mailaddress);
