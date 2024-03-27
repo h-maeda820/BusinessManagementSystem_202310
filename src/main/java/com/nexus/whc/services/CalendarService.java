@@ -122,9 +122,18 @@ public class CalendarService {
 	 * @param client_id
 	 * @return
 	 */
-	public List<Map<String, Object>> searchHolidayCount(String client_id, String startOfYear, String endOfYear) {
+	public List<Map<String, Object>> searchHolidayCount(Map<String, Object> map, String startOfYear,
+			String endOfYear) {
 
-		List<Map<String, Object>> list = calendarRepository.searchHolidayCount(client_id, startOfYear, endOfYear);
+		Integer clientId = Integer.parseInt(map.get("client_id").toString());
+		Integer employeeId = null;
+
+		if (map.get("employee_id") != null) {
+			employeeId = Integer.parseInt(map.get("employee_id").toString());
+		}
+
+		List<Map<String, Object>> list = calendarRepository.searchHolidayCount(clientId, employeeId, startOfYear,
+				endOfYear);
 
 		//月が重複していたら排除
 		Set<String> uniqueYearMonths = new HashSet<>();
@@ -140,6 +149,42 @@ public class CalendarService {
 		}
 
 		return resultList;
+	}
+
+	/**
+	 * 顧客社員が一致する、年度内のデータの通年備考を取得する
+	 * @param clientId
+	 * @param employeeId
+	 * @param startOfYear
+	 * @param endOfYear
+	 */
+	public String searchAllYearRoundComment(CalendarData calendarData, String startOfYear,
+			String endOfYear) {
+
+		String comment = "";
+
+		List<Map<String, Object>> list = calendarRepository.searchAllYearRoundComment(calendarData,
+				startOfYear, endOfYear);
+
+		//取得できた場合
+		if (!list.isEmpty()) {
+			//リスト先頭のコメント(通年備考)を取得
+			comment = list.get(0).get("comment").toString();
+		}
+
+		return comment;
+	}
+
+	/**
+	 * 通年備考を更新する
+	 * @param calendarData
+	 * @param yearMonth
+	 * @param comment
+	 * @param userId
+	 */
+	public void updateAllYearRoundComment(CalendarData calendarData, LocalDate yearMonth, String userId) {
+
+		calendarRepository.updateAllYearRoundComment(calendarData, yearMonth, userId);
 	}
 
 	/**

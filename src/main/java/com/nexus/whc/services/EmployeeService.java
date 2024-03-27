@@ -30,13 +30,11 @@ public class EmployeeService {
 	 * delete_flg=falseの社員情報を抽出するSQLを実行する。
 	 * @return list 抽出結果のlist
 	 */
-	public List<Map<String, Object>> searchActive(int pageNumber, int pageSize) {
+	public List<Map<String, Object>> searchActive() {
 
-		/*オフセット数を定義*/
-		int offset = pageNumber * pageSize;
 
 		/*クエリを実行*/
-		List<Map<String, Object>> list = employeeRepository.searchActive(offset, pageSize);
+		List<Map<String, Object>> list = employeeRepository.searchActive();
 
 		/*取得したリストを返す*/
 		return list;

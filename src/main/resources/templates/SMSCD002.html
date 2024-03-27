@@ -233,9 +233,8 @@
 
 						<input type="hidden" name="seqId" th:value="${seqId}" />
 						<input type="hidden" name="mode" id="mode" class="mode" th:value="${mode}" />
-						<input type="hidden" id="isDuplication" th:value="${isDuplication}">
+						<input type="hidden" id="accordingCalendarFlag" th:value="${accordingCalendarFlag}">
 						<input type="hidden" id="duplicationList" th:value="${duplicationList}">
-						<input type="hidden" id="isExclusion" th:value="${isExclusion}">
 						<input type="hidden" id="exclusionList" th:value="${exclusionList}">
 
 						<!--新規登録時のエラーメッセージ-->
@@ -253,7 +252,8 @@
 								<input type="text" id="clientName" class="form-control" name="clientName" readonly
 									th:value="*{clientName != null ? clientName : ''}">
 							</div>
-							<div class="input-group mb-3" style="width: 350px" th:if="${mode == 'create'}">
+							<div class="input-group mb-3" style="width: 350px"
+								th:if="${mode == 'create' || mode == 'copy'}">
 								<button type="button" class="btn btn-def border border-dark" id="openClientModal"
 									style="color: white">顧客選択</button>
 							</div>
@@ -739,12 +739,13 @@
 				}
 			});
 
-			//暦通り登録上書き重複確認
+
 			document.addEventListener("DOMContentLoaded", function () {
 
-				var flag = $("#isDuplication").val();
+				var flag = $("#accordingCalendarFlag").val();
 
-				if (flag == "open") {
+				//暦通り登録上書き重複確認
+				if (flag == "duplication") {
 
 					var list = $("#duplicationList").val();
 					// ダイアログに表示するメッセージの生成
@@ -762,20 +763,22 @@
 						return false;
 					}
 				}
-			});
 
-			//暦通り登録上書き確認
-			document.addEventListener("DOMContentLoaded", function () {
-
-				var flag = $("#isExclusion").val();
-				
-				if (flag == "open") {
+				//暦通り登録排他チェック(編集中)
+				else if (flag == "exclusion") {
 
 					var list = $("#exclusionList").val();
 					// ダイアログに表示するメッセージの生成
 					var message = "登録しようとしている年月の中に編集中のデータが存在します。\n 編集中データ：" + list;
 
 					alert(message);
+				}
+
+				//それ以外(登録)
+				else if (flag == "regist") {
+					var form = $("#form");
+					form.attr('action', '/calendar/accordingCalendar/regist');
+					form.submit();
 				}
 			});
 		</script>

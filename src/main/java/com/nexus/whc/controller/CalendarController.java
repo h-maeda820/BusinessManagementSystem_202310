@@ -406,6 +406,10 @@ public class CalendarController {
 		//カレンダーに表示できる形に整形
 		List<List<CalendarDetail>> formatLists = formatCalendarList(details, calendarData.getYearMonth());
 
+		//通年備考を取得して保存
+		String comment = searchAllYearRoundComment(calendarData);
+		calendarData.setAllYearRoundComment(comment);
+
 		//スコープに保存
 		model.addAttribute("calendarData", calendarData);
 		model.addAttribute("calendarDatail", formatLists);
@@ -476,6 +480,9 @@ public class CalendarController {
 		// 月間所定日数
 		int monthlyPrescribedDays = endDate.getDayOfMonth() - details.holidayCount();
 
+		//通年備考を更新
+		updateAllYearRoundComment(calendarData, calendarData.getYearMonth());
+
 		// カレンダーテーブルに登録
 		calendarService.createCalendar(clientId, calendarData.getEmployeeId(), calendarData.getYearMonth(),
 				details.holidayCount(), monthlyPrescribedDays,
@@ -543,8 +550,9 @@ public class CalendarController {
 			return "redirect:/calendar/create";
 		}
 
-		String isDuplication = "";
-		String isExclusion = "";
+		//String isDuplication = "";
+		//String isExclusion = "";
+		String accordingCalendarFlag = "";
 
 		List<String> duplicationList = new ArrayList<>();
 		List<String> exclusionList = new ArrayList<>();
@@ -580,7 +588,7 @@ public class CalendarController {
 
 				//リストに追加
 				duplicationList.add(formattedDate);
-				isDuplication = "open";
+				accordingCalendarFlag = "duplication";
 
 				String seqId = calendarService.getSeqId(calendarData, date).toString();
 
@@ -588,7 +596,7 @@ public class CalendarController {
 				if (exclusiveCheck.ExclusiveCheckEdited(seqId, userId, tableNumber)) {
 
 					exclusionList.add(formattedDate);
-					isExclusion = "open";
+					accordingCalendarFlag = "exclusion";
 				}
 				/* 排他チェック（編集済） */
 				exclusiveCheck.ExclusiveLockDalete(seqId, userId, tableNumber);
@@ -596,15 +604,19 @@ public class CalendarController {
 		}
 
 		//編集中
-		if (isExclusion.equals("open")) {
-			attr.addFlashAttribute("isExclusion", isExclusion);
+		if (accordingCalendarFlag.equals("exclusion")) {
 			attr.addFlashAttribute("exclusionList", exclusionList);
 		}
 		//重複している
-		else if (isDuplication.equals("open")) {
-			attr.addFlashAttribute("isDuplication", isDuplication);
+		else if (accordingCalendarFlag.equals("duplication")) {
 			attr.addFlashAttribute("duplicationList", duplicationList);
 		}
+		//それ以外
+		else {
+			accordingCalendarFlag = "regist";
+		}
+
+		attr.addFlashAttribute("accordingCalendarFlag", accordingCalendarFlag);
 
 		return "redirect:/calendar/create";
 	}
@@ -669,11 +681,14 @@ public class CalendarController {
 			//重複している場合 更新
 			if (duplicationSeqId != -1) {
 
+				//通年備考を更新
+				updateAllYearRoundComment(calendarData, date);
 				// 更新
 				calendarService.updateCalendar(duplicationSeqId.toString(), calendarData.getEmployeeId(),
 						details.holidayCount(),
 						lastDayOfMonth - details.holidayCount(),
 						"", userId);
+
 				// 詳細更新
 				calendarService.updateCalendarDetails(details.isHolidayFlag(), details.getComment(), userId,
 						duplicationSeqId.toString(),
@@ -681,6 +696,9 @@ public class CalendarController {
 
 				//重複していない場合新規登録
 			} else {
+
+				//通年備考を更新
+				updateAllYearRoundComment(calendarData, date);
 				// カレンダーテーブルに登録
 				calendarService.createCalendar(clientId, calendarData.getEmployeeId(), date, monthlyHoliday,
 						monthlyPrescribedDays,
@@ -901,6 +919,10 @@ public class CalendarController {
 		calendarService.updateCalendar(seqId, updateData.getEmployeeId(), details.holidayCount(),
 				lastDayOfMonth - details.holidayCount(),
 				updateData.getAllYearRoundComment(), userId);
+
+		//通年備考を更新
+		updateAllYearRoundComment(updateData, updateData.getYearMonth());
+
 		// 詳細更新
 		calendarService.updateCalendarDetails(details.isHolidayFlag(), details.getComment(), userId, seqId,
 				details.getDate());
@@ -1037,8 +1059,7 @@ public class CalendarController {
 	}
 
 	/**
-	 * 引数で渡された月の日付と休日のリストを返す
-	 * 
+	 * 日付と休日が暦通りに登録された詳細データを返す
 	 * @param yearMonth 開始日
 	 * @return
 	 */
@@ -1067,7 +1088,12 @@ public class CalendarController {
 			// 土日かチェック
 			boolean isWeekend = dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY;
 			// 祝日判定
-			boolean isHoliday = isJapaneseHoliday(date);
+			boolean isHoliday = false;
+			String holidayName = getJapaneseHolidayName(date);
+
+			if (!holidayName.equals("")) {
+				isHoliday = true;
+			}
 
 			// 振替休日判定
 			// 日曜が祝日ならflagをtrue
@@ -1077,6 +1103,7 @@ public class CalendarController {
 			if (dayOfWeek == DayOfWeek.MONDAY && substitute == true) {
 				isHoliday = true;
 				substitute = false;
+				holidayName = "振替休日";
 			}
 
 			if (isWeekend || isHoliday) {
@@ -1087,7 +1114,7 @@ public class CalendarController {
 
 			datail.setDate(formattedDay);
 			datail.setDayOfWeek(dayOfWeek.getValue());
-			datail.setComment("");
+			datail.setComment(holidayName);
 			details.addDetails(datail, Integer.parseInt(formattedDay) - 1);
 		}
 
@@ -1114,8 +1141,7 @@ public class CalendarController {
 
 		// 既存の月、休日数を格納したリスト
 		List<Map<String, Object>> holidayList = calendarService.searchHolidayCount(
-				list.get("client_id").toString(),
-				startOfYear.toString(), endOfYear.toString());
+				list, startOfYear.toString(), endOfYear.toString());
 
 		// 既存の月だけを格納したリスト
 		List<String> holidayMonth = new ArrayList<>();
@@ -1126,7 +1152,7 @@ public class CalendarController {
 		// 年間休日数保存用
 		int holidayCount = 0;
 
-		// その年度の3月から4月までを月単位で繰り返す(for)
+		// その年度の3月から4月までを月単位で繰り返す
 		for (LocalDate date = startOfYear; !date.isAfter(endOfYear); date = date.plusMonths(1)) {
 
 			// dateをString型に変換
@@ -1156,6 +1182,52 @@ public class CalendarController {
 		}
 
 		return holidayCount;
+	}
+
+	/**
+	 * 新規登録時
+	 * 顧客、社員が一致する、年度内のデータの通年備考を取得する
+	 * @param calendarData
+	 * @return
+	 */
+	private String searchAllYearRoundComment(CalendarData calendarData) {
+
+		//年月を取得
+		LocalDate yearMonth = calendarData.getYearMonth();
+
+		// 年度の始め、終わりを求める
+		LocalDate startOfYear = LocalDate.of(yearMonth.getYear(), Month.APRIL, 1);
+		if (yearMonth.isBefore(startOfYear)) {
+			startOfYear = startOfYear.minusYears(1); // 前年の年度の始まりに補正
+		}
+		LocalDate endOfYear = startOfYear.plusMonths(12).minusDays(1);
+
+		//コメントを取得
+		String comment = calendarService.searchAllYearRoundComment(calendarData,
+				startOfYear.toString(), endOfYear.toString());
+
+		return comment;
+	}
+
+	/**
+	 *同年度内の通年備考を更新する 
+	 * @param calendarData
+	 */
+	private void updateAllYearRoundComment(CalendarData calendarData, LocalDate yearMonth) {
+
+		// 年度の始め、終わりを求める
+		LocalDate startOfYear = LocalDate.of(yearMonth.getYear(), Month.APRIL, 1);
+		if (yearMonth.isBefore(startOfYear)) {
+			startOfYear = startOfYear.minusYears(1); // 前年の年度の始まりに補正
+		}
+		LocalDate endOfYear = startOfYear.plusMonths(12).minusDays(1);
+
+		// その年度の3月から4月までを月単位で繰り返す
+		for (LocalDate date = startOfYear; !date.isAfter(endOfYear); date = date.plusMonths(1)) {
+
+			//更新処理
+			calendarService.updateAllYearRoundComment(calendarData, date, userId);
+		}
 	}
 
 	/**
@@ -1249,39 +1321,92 @@ public class CalendarController {
 	 * @param date
 	 * @return
 	 */
-	private static boolean isJapaneseHoliday(LocalDate date) {
+	//	private static boolean isJapaneseHoliday(LocalDate date) {
+	//		int year = date.getYear();
+	//		Month month = date.getMonth();
+	//		int day = date.getDayOfMonth();
+	//
+	//		// 祝日の判定
+	//		if ((month == Month.JANUARY && day == 1) || // 元日
+	//				(month == Month.JANUARY && date.getDayOfWeek() == DayOfWeek.MONDAY && day >= 8 && day <= 14) || // 成人の日（1月の第2月曜日）
+	//				(month == Month.FEBRUARY && day == 11) || // 建国記念日
+	//				(month == Month.FEBRUARY && day == 23 && year >= 2020) || // 天皇誕生日
+	//				(month == Month.MARCH && day == calculateVernalEquinoxDay(year)) || // 春分の日
+	//				(month == Month.APRIL && day == 29) || // 昭和の日
+	//				(month == Month.MAY && day == 3) || // 憲法記念日
+	//				(month == Month.MAY && day == 4) || // みどりの日
+	//				(month == Month.MAY && day == 5) || // こどもの日
+	//				(month == Month.JULY
+	//						&& date.with(TemporalAdjusters.firstInMonth(DayOfWeek.MONDAY)).plusDays(14).isEqual(date))
+	//				|| // 海の日（7月の第3月曜日）
+	//				(month == Month.AUGUST && day == 11 && year >= 2016) || // 山の日
+	//				(month == Month.SEPTEMBER
+	//						&& date.with(TemporalAdjusters.firstInMonth(DayOfWeek.MONDAY)).plusDays(14).isEqual(date))
+	//				|| // 敬老の日（9月の第3月曜日）
+	//				(month == Month.SEPTEMBER && day == calculateAutumnalEquinoxDay(year)) || // 秋分の日
+	//				(month == Month.OCTOBER
+	//						&& date.with(TemporalAdjusters.firstInMonth(DayOfWeek.MONDAY)).plusDays(7).isEqual(date))
+	//				|| // 体育の日（10月の第2月曜日）
+	//				(month == Month.NOVEMBER && day == 3) || // 文化の日
+	//				(month == Month.NOVEMBER && day == 23) || // 勤労感謝の日
+	//				((month == Month.DECEMBER && day >= 29) || (month == Month.JANUARY && day <= 3))) {// 年末年始（12月29日から1月3日）
+	//			return true;
+	//		}
+	//
+	//		return false;
+	//	}
+
+	/**
+	 * 祝日名を返すメソッド
+	 * @param date
+	 * @return
+	 */
+	private static String getJapaneseHolidayName(LocalDate date) {
 		int year = date.getYear();
 		Month month = date.getMonth();
 		int day = date.getDayOfMonth();
 
 		// 祝日の判定
-		if ((month == Month.JANUARY && day == 1) || // 元日
-				(month == Month.JANUARY && date.getDayOfWeek() == DayOfWeek.MONDAY && day >= 8 && day <= 14) || // 成人の日（1月の第2月曜日）
-				(month == Month.FEBRUARY && day == 11) || // 建国記念日
-				(month == Month.FEBRUARY && day == 23 && year >= 2020) || // 天皇誕生日
-				(month == Month.MARCH && day == calculateVernalEquinoxDay(year)) || // 春分の日
-				(month == Month.APRIL && day == 29) || // 昭和の日
-				(month == Month.MAY && day == 3) || // 憲法記念日
-				(month == Month.MAY && day == 4) || // みどりの日
-				(month == Month.MAY && day == 5) || // こどもの日
-				(month == Month.JULY
-						&& date.with(TemporalAdjusters.firstInMonth(DayOfWeek.MONDAY)).plusDays(14).isEqual(date))
-				|| // 海の日（7月の第3月曜日）
-				(month == Month.AUGUST && day == 11 && year >= 2016) || // 山の日
-				(month == Month.SEPTEMBER
-						&& date.with(TemporalAdjusters.firstInMonth(DayOfWeek.MONDAY)).plusDays(14).isEqual(date))
-				|| // 敬老の日（9月の第3月曜日）
-				(month == Month.SEPTEMBER && day == calculateAutumnalEquinoxDay(year)) || // 秋分の日
-				(month == Month.OCTOBER
-						&& date.with(TemporalAdjusters.firstInMonth(DayOfWeek.MONDAY)).plusDays(7).isEqual(date))
-				|| // 体育の日（10月の第2月曜日）
-				(month == Month.NOVEMBER && day == 3) || // 文化の日
-				(month == Month.NOVEMBER && day == 23) || // 勤労感謝の日
-				((month == Month.DECEMBER && day >= 29) || (month == Month.JANUARY && day <= 3))) {// 年末年始（12月29日から1月3日）
-			return true;
+		if ((month == Month.JANUARY && day == 1)) {
+			return "元日";
+		} else if (month == Month.JANUARY && date.getDayOfWeek() == DayOfWeek.MONDAY && day >= 8 && day <= 14) {
+			return "成人の日";
+		} else if (month == Month.FEBRUARY && day == 11) {
+			return "建国記念日";
+		} else if (month == Month.FEBRUARY && day == 23 && year >= 2020) {
+			return "天皇誕生日";
+		} else if (month == Month.MARCH && day == calculateVernalEquinoxDay(year)) {
+			return "春分の日";
+		} else if (month == Month.APRIL && day == 29) {
+			return "昭和の日";
+		} else if (month == Month.MAY && day == 3) {
+			return "憲法記念日";
+		} else if (month == Month.MAY && day == 4) {
+			return "みどりの日";
+		} else if (month == Month.MAY && day == 5) {
+			return "こどもの日";
+		} else if (month == Month.JULY
+				&& date.with(TemporalAdjusters.firstInMonth(DayOfWeek.MONDAY)).plusDays(14).isEqual(date)) {
+			return "海の日";
+		} else if (month == Month.AUGUST && day == 11 && year >= 2016) {
+			return "山の日";
+		} else if (month == Month.SEPTEMBER
+				&& date.with(TemporalAdjusters.firstInMonth(DayOfWeek.MONDAY)).plusDays(14).isEqual(date)) {
+			return "敬老の日";
+		} else if (month == Month.SEPTEMBER && day == calculateAutumnalEquinoxDay(year)) {
+			return "秋分の日";
+		} else if (month == Month.OCTOBER
+				&& date.with(TemporalAdjusters.firstInMonth(DayOfWeek.MONDAY)).plusDays(7).isEqual(date)) {
+			return "スポーツの日";
+		} else if (month == Month.NOVEMBER && day == 3) {
+			return "文化の日";
+		} else if (month == Month.NOVEMBER && day == 23) {
+			return "勤労感謝の日";
+		} else if ((month == Month.DECEMBER && day >= 29) || (month == Month.JANUARY && day <= 3)) {
+			return "年末年始";
+		} else {
+			return "";
 		}
-
-		return false;
 	}
 
 	private static int calculateVernalEquinoxDay(int year) {

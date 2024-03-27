@@ -95,6 +95,9 @@ public class EmployeeController {
 
 		List<Map<String, Object>> empList = new ArrayList<>();
 
+		List<Map<String, Object>> listAll = employeeService.searchActive();
+		List<Map<String, Object>> countList = new ArrayList<>();
+
 		/*空だったらエラーメッセージとセッションスコープに””を入れる*/
 		if (list.isEmpty()) {
 			model.addAttribute("searchError", "社員一覧の検索結果は0件です。条件を変更し、再度検索してください。");
@@ -123,6 +126,19 @@ public class EmployeeController {
 				String formattedEmployeeId = String.format("%04d", (Integer) status.get("employee_id"));
 				status.put("employee_id", formattedEmployeeId);
 			}
+			//ページ数カウント用listにもステータスを設定
+			for (Map<String, Object> map : listAll) {
+				//有給残日数(当年度分)を取得　
+				Integer remaindThisYear = Integer.parseInt(map.get("remaind_this_year").toString());
+				//有給残日数(前年度分)を取得
+				Integer remaindLastYear = Integer.parseInt(map.get("remaind_last_year").toString());
+				//有休基準日を取得
+				LocalDate paidHolidayStd = LocalDate.parse(map.get("paid_holiday_std").toString());
+
+				//ステータスを取得して保存
+				String attributeValue = getStatus(remaindThisYear, remaindLastYear, paidHolidayStd);
+				map.put("application_class", attributeValue);
+			}
 
 			//ステータスのどれかにチェックがついているとき
 			if (searchForm.isNoPaidHoliday() || searchForm.isNotificationPaidHoliday()
@@ -146,8 +162,28 @@ public class EmployeeController {
 						empList.add(map);
 					}
 				}
+				//カウント用list
+				for (Map<String, Object> map : listAll) {
+
+					if (searchForm.isNoPaidHoliday() && map.get("application_class").toString().equals("有給残日数なし")) {
+						empList.add(map);
+					}
+					if (searchForm.isNotificationPaidHoliday()
+							&& map.get("application_class").toString().equals("有給取得日数不足(通知)")) {
+						empList.add(map);
+					}
+					if (searchForm.isAttentionPaidHoliday()
+							&& map.get("application_class").toString().equals("有給取得日数不足(注意)")) {
+						empList.add(map);
+					}
+					if (searchForm.isWarningPaidHoliday()
+							&& map.get("application_class").toString().equals("有給取得日数不足(警告)")) {
+						empList.add(map);
+					}
+				}
 			} else {
 				empList = list;
+				countList = listAll;
 			}
 		}
 
@@ -166,8 +202,7 @@ public class EmployeeController {
 
 		//ページネーション用
 		//アクティブなデータの総数
-		int totalCount = employeeService.searchEmpCount(searchForm.getEmployeeId(),
-				searchForm.getEmployeeName(), searchForm.getClientId(), searchForm.getClientName());
+		int totalCount = countList.size();
 
 		//20件ずつ表示したときのページ数
 		int totalPage = (int) Math.ceil((double) totalCount / pageSize);
@@ -1366,14 +1401,6 @@ public class EmployeeController {
 				} else if (monthsDifference <= 6) { // 6ヶ月の場合
 					attributeValue = "有給取得日数不足(通知)";
 				}
-
-				//				System.out.println("今日の日付: " + today);
-				//				System.out.println("基準日: " + paidHolidayStd);
-				//				System.out.println("日の差: " + daysDifference + "日");
-				//				System.out.println("月の差: " + monthsDifference + "ヶ月");
-				//				System.out.println("ステータス: " + attributeValue);
-				//
-				//				System.out.println();
 			}
 		}
 

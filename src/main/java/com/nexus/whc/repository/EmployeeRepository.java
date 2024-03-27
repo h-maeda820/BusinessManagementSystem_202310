@@ -29,7 +29,7 @@ public class EmployeeRepository {
 	 * 
 	 * @return list 抽出結果のlist
 	 */
-	public List<Map<String, Object>> searchActive(int offset, int pageSize) {
+	public List<Map<String, Object>> searchActive() {
 
 		/* SQL文作成 */
 		String sql = "SELECT m_employee.employee_id, m_employee.employee_name, m_employee.client_id,"
@@ -46,11 +46,10 @@ public class EmployeeRepository {
 				+ " GROUP BY m_employee.employee_id,m_employee.employee_name,m_employee.client_id,"
 				+ " m_client.client_name,m_employee.hourly_wage,m_employee.paid_holiday_std,m_employee_paid_vacation.remaind_this_year,"
 				+ " m_employee_paid_vacation.remaind_last_year,t_work_leave_application.application_class"
-				+ " ORDER BY m_employee.employee_id ASC"
-				+ "  LIMIT ? OFFSET ?";
+				+ " ORDER BY m_employee.employee_id ASC";
 
 		/* クエリを実行 */
-		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql, pageSize, offset);
+		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);
 		System.out.println(list);
 
 		/* 取得したリストを返す */

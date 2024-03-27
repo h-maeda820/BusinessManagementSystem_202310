@@ -432,10 +432,16 @@ public class CalendarRepository {
 
 	/**
 	 * 指定した顧客の、登録されている月と休日数を取得
-	 * @param client_id
+	 * @param clientId
+	 * @param employeeId
+	 * @param startOfYear
+	 * @param endOfYear
 	 * @return
 	 */
-	public List<Map<String, Object>> searchHolidayCount(String client_id, String startOfYear, String endOfYear) {
+	public List<Map<String, Object>> searchHolidayCount(Integer clientId, Integer employeeId, String startOfYear,
+			String endOfYear) {
+
+		List<Object> paramList = new ArrayList<>();
 
 		// SQL文作成
 		String sql = "SELECT DISTINCT\n"
@@ -446,8 +452,17 @@ public class CalendarRepository {
 				+ "INNER JOIN\n"
 				+ "    m_client ON m_calendar.client_id = m_client.client_id\n"
 				+ "WHERE\n"
-				+ "    m_calendar.delete_flg != 1\n"
-				+ "    AND m_calendar.client_id = ?\n"
+				+ "    m_calendar.delete_flg != 1 \n";
+
+		//社員idが登録されている場合
+		if (employeeId != null) {
+			sql += "AND m_calendar.employee_id = ? ";
+			paramList.add(employeeId);
+		} else {
+			sql += "AND m_calendar.employee_id IS NULL ";
+		}
+
+		sql += "    AND m_calendar.client_id = ?\n"
 				+ "    AND NOT EXISTS (\n"
 				+ "        SELECT 1\n"
 				+ "        FROM m_client\n"
@@ -456,12 +471,109 @@ public class CalendarRepository {
 				+ "    )\n"
 				+ "    AND m_calendar.year_month BETWEEN ? AND ?;";
 
-		// パラメータを設定
-		Object[] param = { client_id, startOfYear, endOfYear };
+		// 他のパラメータを設定
+		paramList.add(clientId);
+		paramList.add(startOfYear);
+		paramList.add(endOfYear);
+
+		Object[] param = paramList.toArray();
 
 		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql, param);
 
 		return list;
+	}
+
+	/**
+	 * 顧客社員が一致する、年度内のデータの通年備考を取得する
+	 * @param clientId
+	 * @param employeeId
+	 * @param startOfYear
+	 * @param endOfYear
+	 * @return
+	 */
+	public List<Map<String, Object>> searchAllYearRoundComment(CalendarData calendarData, String startOfYear,
+			String endOfYear) {
+
+		List<Object> paramList = new ArrayList<>();
+
+		// SQL文作成
+		String sql = "SELECT DISTINCT \n"
+				+ "    m_calendar.year_month, "
+				+ "    m_calendar.comment "
+				+ "FROM\n"
+				+ "    m_calendar\n"
+				+ "INNER JOIN\n"
+				+ "    m_client ON m_calendar.client_id = m_client.client_id\n"
+				+ "WHERE\n"
+				+ "    m_calendar.delete_flg != 1 \n";
+
+		//社員idが登録されている場合
+		if (calendarData.getEmployeeId() != null) {
+			sql += "AND m_calendar.employee_id = ? ";
+			paramList.add(calendarData.getEmployeeId());
+		} else {
+			sql += "AND m_calendar.employee_id IS NULL ";
+		}
+
+		sql += "    AND m_client.client_name = ?\n"
+				+ "    AND NOT EXISTS (\n"
+				+ "        SELECT 1\n"
+				+ "        FROM m_client\n"
+				+ "        WHERE m_client.client_id = m_calendar.client_id\n"
+				+ "        AND m_client.delete_flg = 1\n"
+				+ "    )\n"
+				+ "    AND m_calendar.year_month BETWEEN ? AND ?;";
+
+		// 他のパラメータを設定
+		paramList.add(calendarData.getClientName());
+		paramList.add(startOfYear);
+		paramList.add(endOfYear);
+
+		Object[] param = paramList.toArray();
+
+		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql, param);
+
+		return list;
+	}
+
+	/**
+	 * 通年備考を更新する
+	 * @param calendarData
+	 * @param yearMonth
+	 * @param comment
+	 * @param userId
+	 */
+	public void updateAllYearRoundComment(CalendarData calendarData, LocalDate yearMonth, String userId) {
+
+		String sql = "UPDATE m_calendar\r\n"
+				+ "INNER JOIN m_client ON m_calendar.client_id = m_client.client_id\r\n"
+				+ "SET \r\n"
+				+ "    m_calendar.COMMENT = ? , "
+				+ "    m_calendar.updated_at = CURRENT_TIMESTAMP ,"
+				+ "    m_calendar.updated_user = ? "
+				+ "WHERE  \r\n"
+				+ "    m_client.client_name = ? "
+				+ "    AND m_calendar.`year_month` = ? ";
+
+		List<Object> paramList = new ArrayList<>();
+
+		paramList.add(calendarData.getAllYearRoundComment());
+		paramList.add(userId);
+		paramList.add(calendarData.getClientName());
+		paramList.add(yearMonth);
+
+		//社員idが登録されている場合
+		if (calendarData.getEmployeeId() != null) {
+			sql += "AND m_calendar.employee_id = ? ";
+			paramList.add(calendarData.getEmployeeId());
+		} else {
+			sql += "AND m_calendar.employee_id IS NULL ";
+		}
+
+		Object[] param = paramList.toArray();
+
+		jdbcTemplate.update(sql, param);
+
 	}
 
 	/**
