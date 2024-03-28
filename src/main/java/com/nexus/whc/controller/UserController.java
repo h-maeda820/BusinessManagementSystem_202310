@@ -108,7 +108,7 @@ public class UserController {
 		/*もし検索結果が0件だったらエラーメッセージをスコープに保存*/
 		if (searchActiveUserList.isEmpty()) {
 			List<Map<String, Object>> listAll = userServices.searchAll();
-			if (listAll.isEmpty()) {
+			if (!listAll.isEmpty()) {
 				model.addAttribute("result", "ユーザー一覧の検索結果は0件です。条件を変更し、再度検索してください。");
 			}
 		}

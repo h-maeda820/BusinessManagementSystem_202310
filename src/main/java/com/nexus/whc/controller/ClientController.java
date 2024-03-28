@@ -102,7 +102,7 @@ public class ClientController {
 		//返された顧客情報が0件かチェック
 		if (list.isEmpty()) {
 			List<Map<String, Object>> listAll = clientService.searchAll();
-			if (listAll.isEmpty()) {
+			if (!listAll.isEmpty()) {
 				model.addAttribute("result", "顧客一覧の検索結果は0件です。条件を変更し、再度検索してください。");
 			}
 		} else {

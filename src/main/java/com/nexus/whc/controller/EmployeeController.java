@@ -101,7 +101,7 @@ public class EmployeeController {
 		/*空だったらエラーメッセージとセッションスコープに””を入れる*/
 		if (list.isEmpty()) {
 			List<Map<String, Object>> all = employeeService.searchAll();
-			if (all.isEmpty()) {
+			if (!all.isEmpty()) {
 				model.addAttribute("searchError", "社員一覧の検索結果は0件です。条件を変更し、再度検索してください。");
 			}
 		} else {
@@ -297,180 +297,7 @@ public class EmployeeController {
 		return "redirect:/employee/list?pageNumber=" + pageNumber;
 	}
 
-	//
-	//	/**
-	//	 * SMSEM001 社員マスタ一覧画面遷移
-	//	 * ページネーションを実装
-	//	 * 社員マスタ一覧画面に遷移する
-	//	 */
-	//	@GetMapping("/list")
-	//	public String employeeList(@RequestParam(defaultValue = "1") int page,
-	//
-	//			Model model) {
-	//
-	//		/**現在のページとページサイズを引数に設定
-	//		* 1ページずれるためpageを-1
-	//		*/
-	//		List<Map<String, Object>> list = employeeService.searchActive(page - 1, pageSize);
-	//
-	//		/*ここで総データ数を取得するロジックを実装し、総ページ数を計算*/
-	//		int totalClients = employeeService.countEmployee();
-	//		int totalPages = (int) Math.ceil((double) totalClients / pageSize);
-	//
-	//		/*1を加えて0ベースを1ベースに変更*/
-	//		int correctedPageNumber = page + 1;
-	//
-	//		//顧客選択用
-	//		List<Map<String, Object>> clientList = employeeService.getClient();
-	//		model.addAttribute("client_list", clientList);
-	//		model.addAttribute("clientDialog", 0);
-	//
-	//		//条件違うから変更する
-	//		/*ステータスの文言を条件によって変更するためのfor文*/
-	//		for (Map<String, Object> status : list) {
-	//			/*今年の休暇数を取得　Object→String→Integerに変換*/
-	//			Object oHolidayCount = status.get("holiday_count");
-	//			String sHolidayCount = oHolidayCount.toString();
-	//			Integer holidayCount = new Integer(sHolidayCount).intValue();
-	//
-	//			/*有給残日数(当年度分)を取得　Object→String→Integerに変換*/
-	//			Object oRemaindThisYear = status.get("remaind_this_year");
-	//			String sRemaindThisYear = oRemaindThisYear.toString();
-	//			Integer remaindThisYear = new Integer(sRemaindThisYear).intValue();
-	//
-	//			/*有給残日数(前年度分)を取得　Object→String→Integerに変換*/
-	//			Object oRemaindLastYear = status.get("remaind_last_year");
-	//			String sRemaindLastYear = oRemaindLastYear.toString();
-	//			Integer remaindLastYear = new Integer(sRemaindLastYear).intValue();
-	//
-	//			/*ステータスの文言を初期化*/
-	//			String attributeValue = "";
-	//
-	//			//条件が違うから変更する 未完成
-	//			/*有給取得が5日未満の場合、日数に応じてステータスの文言を変更*/
-	//			if (remaindThisYear + remaindLastYear - holidayCount <= 0) {
-	//				attributeValue = "有給残日数なし";
-	//				model.addAttribute("paid", "");
-	//			} else if (remaindThisYear != 0 && holidayCount == 0 || holidayCount == 1) {
-	//				attributeValue = "有給取得日数不足(警告)";
-	//				model.addAttribute("paid", 0);
-	//			} else if (remaindThisYear != 0 && holidayCount == 2 || holidayCount == 3) {
-	//				attributeValue = "有給取得日数不足(注意)";
-	//				model.addAttribute("paid", 1);
-	//			} else if (remaindThisYear != 0 && holidayCount == 4) {
-	//				attributeValue = "有給取得日数不足(通知)";
-	//				model.addAttribute("paid", "");
-	//			}
-	//
-	//			/*ステータスの文言に置き換え*/
-	//			status.put("application_class", attributeValue);
-	//		}
-	//
-	//		/*スコープに保存*/
-	//		model.addAttribute("list", list);
-	//		model.addAttribute("currentPage", correctedPageNumber);
-	//		model.addAttribute("totalPages", totalPages);
-	//
-	//		/*ページネーションのHTMLをlistで判定用にスコープに保存*/
-	//		model.addAttribute("listPage", true);
-	//
-	//		return res1;
-	//	}
-	//
-	//	/**
-	//	 * SMSEM001 社員マスタ一覧画面遷移
-	//	 * ページネーションの実装
-	//	 * キャンセル押下時排他チェックのロック中のロックを解除して社員マスタ一覧画面に遷移する
-	//	 */
-	//	@PostMapping("/list")
-	//	public String employeePostList(@RequestParam(defaultValue = "1") int page, Model model,
-	//			@RequestParam(name = "action", defaultValue = "") String action,
-	//			@RequestParam(name = "employeeId", defaultValue = "") String empId,
-	//			@RequestParam(name = "searchClientButton", defaultValue = "") String searchClientButton, //顧客ダイアログで検索ボタン押したか
-	//			@RequestParam(name = "searchClientId", defaultValue = "") String searchClientId, //顧客ダイアログに入力した顧客番号
-	//			@RequestParam(name = "searchClientName", defaultValue = "") String searchClientName) {
-	//
-	//		/*排他チェック用のログインId*/
-	//		String loginUserId = "nexus001";
-	//
-	//		/*送信時(キャンセル)のボタンを判定して遷移先指定*/
-	//		if ("cancel".equals(action)) {
-	//			/*排他チェック（編集中ロック解除）*/
-	//			exclusiveCheck.ExclusiveLockDalete(empId, loginUserId, tableNumber);
-	//		}
-	//
-	//		/**現在のページとページサイズを引数に設定
-	//		* 1ページずれるためpageを-1
-	//		*/
-	//		List<Map<String, Object>> list = employeeService.searchActive(page - 1, pageSize);
-	//
-	//		/*ここで総データ数を取得するロジックを実装し、総ページ数を計算*/
-	//		int totalClients = employeeService.countEmployee();
-	//		int totalPages = (int) Math.ceil((double) totalClients / pageSize);
-	//
-	//		/*1を加えて0ベースを1ベースに変更*/
-	//		int correctedPageNumber = page + 1;
-	//
-	//		//顧客選択用
-	//		List<Map<String, Object>> clientList = employeeService.getClient(searchClientId, searchClientName);
-	//		model.addAttribute("client_list", clientList);
-	//		model.addAttribute("clientId", searchClientId);//検索欄に入力したid
-	//		model.addAttribute("clientName", searchClientName);//検索欄に入力したname
-	//		//顧客ダイアログの検索ボタン押されていたら顧客ダイアログを表示
-	//		if (searchClientButton.equals("open")) {
-	//			model.addAttribute("clientDialog", 1);//1:表示 0:非表示
-	//		} else {
-	//			model.addAttribute("clientDialog", 0);
-	//		}
-	//
-	//		/*ステータスの文言を条件によって変更するためのfor文*/
-	//		for (Map<String, Object> status : list) {
-	//			/*今年の休暇数を取得　Object→String→Integerに変換*/
-	//			Object oHolidayCount = status.get("holiday_count");
-	//			String sHolidayCount = oHolidayCount.toString();
-	//			Integer holidayCount = new Integer(sHolidayCount).intValue();
-	//
-	//			/*有給残日数(当年度分)を取得　Object→String→Integerに変換*/
-	//			Object oRemaindThisYear = status.get("remaind_this_year");
-	//			String sRemaindThisYear = oRemaindThisYear.toString();
-	//			Integer remaindThisYear = new Integer(sRemaindThisYear).intValue();
-	//
-	//			/*有給残日数(前年度分)を取得　Object→String→Integerに変換*/
-	//			Object oRemaindLastYear = status.get("remaind_last_year");
-	//			String sRemaindLastYear = oRemaindLastYear.toString();
-	//			Integer remaindLastYear = new Integer(sRemaindLastYear).intValue();
-	//
-	//			/*ステータスの文言を初期化*/
-	//			String attributeValue = "";
-	//
-	//			//条件が違うから変更する 未完成
-	//			/*有給取得が5日未満の場合、日数に応じてステータスの文言を変更*/
-	//			if (remaindThisYear + remaindLastYear - holidayCount <= 0) {
-	//				attributeValue = "有給残日数なし";
-	//			} else if (remaindThisYear != 0 && holidayCount == 0 || holidayCount == 1) {
-	//				attributeValue = "有給取得日数不足(警告)";
-	//			} else if (remaindThisYear != 0 && holidayCount == 2 || holidayCount == 3) {
-	//				attributeValue = "有給取得日数不足(注意)";
-	//			} else if (remaindThisYear != 0 && holidayCount == 4) {
-	//				attributeValue = "有給取得日数不足(通知)";
-	//			}
-	//
-	//			/*ステータスの文言に置き換え*/
-	//			status.put("application_class", attributeValue);
-	//		}
-	//
-	//		/*スコープに保存*/
-	//		model.addAttribute("list", list);
-	//		model.addAttribute("currentPage", correctedPageNumber);
-	//		model.addAttribute("totalPages", totalPages);
-	//
-	//		/*ページネーションのHTMLをlistで判定用にスコープに保存*/
-	//		model.addAttribute("listPage", true);
-	//
-	//		return res1;
-	//	}
 
-	//追加
 	/**
 	 * SESEM001 社員マスタ選択行削除処理
 	 * ★選択行削除時に実行
@@ -530,7 +357,7 @@ public class EmployeeController {
 		return "redirect:/employee/list";
 	}
 
-	//追加
+
 	/**
 	 * SESEM001 社員マスタ選択行帳票出力処理
 	 * ★選択行帳票出力時に実行
