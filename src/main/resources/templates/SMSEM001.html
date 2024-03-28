@@ -124,13 +124,14 @@
 
 	<!--tymeleafでheader.html呼び出し-->
 	<header th:replace="~{header :: header}"></header>
-	<!--tymeleafでmenu.html呼び出し-->
-	<div th:replace="~{menu::menu}"></div>
 
 	<input type="hidden" id="clientDialog" th:value="${clientDialog}">
 	<input type="hidden" id="listPage" th:value="${listPage}">
 	<input type="hidden" id="searchPage" th:value="${searchPage}">
 	<div class="d-flex flex-row" style="height: 1000px">
+
+		<!--tymeleafでmenu.html呼び出し-->
+		<div th:replace="~{menu::menu}"></div>
 
 		<main class="w-100 bg-light">
 
@@ -138,6 +139,7 @@
 			<form method="post" name="forms" form id="selectCheck" class="container bg-white border py-3 my-3"
 				th:object="${employeeSearchForm}">
 				<!--				<div class="card shadow bg-light">-->
+
 
 				<!-- 顧客選択ダイアログ -->
 				<section id="clientModal" class="modalArea clientModal">
@@ -203,7 +205,8 @@
 								<table class="table table-sm table-striped table-bordered mt-0">
 									<thead>
 										<tr bgcolor="royalblue" style="color: white">
-											<th scope="col" class="centered-text" style="width: 45px; height: 40px">ステータス
+											<th scope="col" class="centered-text" style="width: 45px; height: 40px">
+												ステータス
 											</th>
 											<th scope="col" class="centered-text" style="width: 20px">行の色</th>
 											<th scope="col" class="centered-text" style="width: 20px">アイコン</th>
@@ -354,7 +357,7 @@
 						<tbody style="font-weight: normal;">
 							<!--Thymeleafを使用してリストの各アイテムに対して行を生成-->
 							<tr th:each="item : ${list}" class="employee-row" style="cursor: pointer;"
-							th:style="${item != null ? item.application_class == '' ? 'background-color: white;' :  item.application_class == '有給残日数なし' ? 'background-color: lightyellow;' : 'background-color: pink' : 'background-color: white;'}">
+								th:style="${item != null ? item.application_class == '' ? 'background-color: white;' :  item.application_class == '有給残日数なし' ? 'background-color: lightyellow;' : 'background-color: pink' : 'background-color: white;'}">
 
 								<th th:if="${item.application_class == '有給取得日数不足(注意)'}" scope="col"
 									style="width: 40px; font-weight: normal; color: orange;">▲</th>
