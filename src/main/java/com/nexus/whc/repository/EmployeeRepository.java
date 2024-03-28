@@ -56,6 +56,15 @@ public class EmployeeRepository {
 		return list;
 	}
 
+	public List<Map<String, Object>> searchAll() {
+		// SQL文作成
+		String sql = "SELECT * from m_employee WHERE delete_flg != 1";
+
+		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);
+
+		return list;
+	}
+	
 	/**
 	 * 社員情報を全件を取得してresultで返すSQLを実行する
 	 * ページネーションで使用

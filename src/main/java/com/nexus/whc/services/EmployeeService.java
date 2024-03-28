@@ -32,12 +32,20 @@ public class EmployeeService {
 	 */
 	public List<Map<String, Object>> searchActive() {
 
-
 		/*クエリを実行*/
 		List<Map<String, Object>> list = employeeRepository.searchActive();
 
 		/*取得したリストを返す*/
 		return list;
+	}
+
+	public List<Map<String, Object>> searchAll() {
+		/*クエリを実行*/
+		List<Map<String, Object>> list = employeeRepository.searchAll();
+
+		/*取得したリストを返す*/
+		return list;
+
 	}
 
 	/**
@@ -187,7 +195,7 @@ public class EmployeeService {
 		employeeDate.setRemaindThisYear(Integer.parseInt(list.get("remaind_this_year").toString()));
 		employeeDate.setRemaindLastYear(Integer.parseInt(list.get("remaind_last_year").toString()));
 		employeeDate.setHolidayCount(Integer.parseInt(list.get("holiday_count").toString()));
-		
+
 		if (list.get("hourly_wage").toString().equals("true")) {
 			employeeDate.setHourlyWage(true);
 		} else {

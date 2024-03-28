@@ -38,6 +38,11 @@ public class CalendarService {
 		this.calendarRepository = calendarRepository;
 	}
 
+	public List<Map<String, Object>> searchAll() {
+		List<Map<String, Object>> list = calendarRepository.searchAll();
+		return list;
+	}
+
 	/**
 	 * カレンダー一覧
 	 * カレンダー情報を全件取得してListで返す

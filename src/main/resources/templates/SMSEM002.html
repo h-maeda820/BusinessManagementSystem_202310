@@ -187,10 +187,10 @@
 					<div class="input-group mb-3" style="width: 800px">
 						<span class="input-group-text">担当顧客番号</span>
 						<input type="text" aria-label="emNo" class="form-control" name="clientId" th:value="*{clientId}"
-							style="width: 150px" id="clientId">
+							style="width: 150px" id="clientId" readonly>
 						<span class="input-group-text">担当顧客名</span>
 						<input type="text" class="form-control" style="width: 150px" id="clientName" name="clientName"
-							th:value="*{clientName}">
+							th:value="*{clientName}" readonly>
 
 						<button type="button" class="btn btn-success border border-dark mb-2 mx-2"
 							style="color: white; background-color: cornflowerblue" id="openClientModal">顧客選択</button>

@@ -31,6 +31,15 @@ public class UserRepository {
 	/*検索結果の総数を格納する変数*/
 	int searchCount;
 
+	public List<Map<String, Object>> searchAll() {
+		// SQL文作成
+		String sql = "SELECT * from m_user WHERE delete_flg != 1";
+
+		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);
+
+		return list;
+	}
+	
 	/**
 	 * ユーザー一覧表示機能
 	 * ユーザー情報から削除フラグが＝1以外を抽出してその全てをListで返すSQLを実行する

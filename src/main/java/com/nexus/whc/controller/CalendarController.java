@@ -91,7 +91,10 @@ public class CalendarController {
 				}
 			}
 			if (result.equals("")) {
-				result = "カレンダー一覧の検索結果は0件です。条件を変更し、再度検索してください。";
+				List<Map<String, Object>> listAll = calendarService.searchAll();
+				if (listAll.isEmpty()) {
+					result = "カレンダー一覧の検索結果は0件です。条件を変更し、再度検索してください。";
+				}
 			}
 			model.addAttribute("result", result);
 

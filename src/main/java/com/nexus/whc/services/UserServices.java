@@ -27,6 +27,14 @@ public class UserServices {
 	@Autowired
 	UserRepository userRepository;
 
+	public List<Map<String, Object>> searchAll() {
+		
+		List<Map<String, Object>> list = userRepository.searchAll();
+
+		/*取得したリストを返す*/
+		return list;
+	}
+	
 	/**
 	 * ユーザー情報から削除フラグが＝1以外を抽出してその全てをListで返す
 	 * @param なし

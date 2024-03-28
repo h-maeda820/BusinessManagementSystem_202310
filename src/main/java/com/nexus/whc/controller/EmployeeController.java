@@ -100,8 +100,10 @@ public class EmployeeController {
 
 		/*空だったらエラーメッセージとセッションスコープに””を入れる*/
 		if (list.isEmpty()) {
-			model.addAttribute("searchError", "社員一覧の検索結果は0件です。条件を変更し、再度検索してください。");
-
+			List<Map<String, Object>> all = employeeService.searchAll();
+			if (all.isEmpty()) {
+				model.addAttribute("searchError", "社員一覧の検索結果は0件です。条件を変更し、再度検索してください。");
+			}
 		} else {
 
 			//ステータスを設定する
